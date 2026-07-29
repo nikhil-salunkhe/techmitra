@@ -6,7 +6,7 @@ import { FaWhatsapp } from 'react-icons/fa';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
-const API_URL = import.meta.env.VITE_API_URL || '/api';
+const API_URL = import.meta.env.VITE_API_URL || '';
 
 const Enrollment = () => {
   const [submitted, setSubmitted] = useState(false);

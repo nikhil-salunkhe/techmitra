@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FiUsers, FiSearch, FiTrash2, FiRefreshCw, FiCheckCircle, FiXCircle, FiClock, FiMail, FiPhone, FiMapPin, FiBook, FiCalendar, FiDollarSign, FiChevronDown, FiChevronUp, FiDownload } from 'react-icons/fi';
 
-const API_URL = import.meta.env.VITE_API_URL || '/api';
+const API_URL = import.meta.env.VITE_API_URL || '';
 
 const Admin = () => {
   const [enrollments, setEnrollments] = useState([]);
@@ -18,7 +18,7 @@ const Admin = () => {
 
   const fetchEnrollments = async () => {
     try {
-      const response = await fetch(`${API_URL}/enrollments`);
+      const response = await fetch(`${API_URL}/api/enrollments`);
       const data = await response.json();
       if (data.success) {
         setEnrollments(data.enrollments);
@@ -42,7 +42,7 @@ const Admin = () => {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this enrollment?')) return;
     try {
-      const response = await fetch(`${API_URL}/enrollments/${id}`, { method: 'DELETE' });
+      const response = await fetch(`${API_URL}/api/enrollments/${id}`, { method: 'DELETE' });
       const data = await response.json();
       if (data.success) {
         fetchEnrollments();
@@ -54,7 +54,7 @@ const Admin = () => {
 
   const handleStatusChange = async (id, newStatus) => {
     try {
-      const response = await fetch(`${API_URL}/enrollments/${id}/status`, {
+      const response = await fetch(`${API_URL}/api/enrollments/${id}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
