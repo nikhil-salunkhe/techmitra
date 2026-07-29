@@ -8,7 +8,7 @@ const About = () => {
   const milestones = [
     { year: '2024', title: 'TechMitra Founded', description: 'Started with a vision to transform final year project development' },
     { year: '2024 Q1', title: 'First Batch Launched', description: 'Launched MERN Stack program with 50 students' },
-    { year: '2024 Q2', title: 'Expanded Programs', description: 'Added Java Full Stack and Python Full Stack programs' },
+    { year: '2024 Q2', title: 'Expanded Programs', description: 'Added Java and Python application development programs' },
     { year: '2024 Q3', title: '100+ Projects', description: 'Celebrated 100+ successfully completed student projects' },
     { year: '2024 Q4', title: 'React Native Added', description: 'Launched mobile app development program' },
     { year: '2025', title: '500+ Students', description: '500+ students trained across all programs' },

@@ -35,7 +35,7 @@ const Admin = () => {
     const total = data.length;
     const active = data.filter(e => e.status === 'active').length;
     const completed = data.filter(e => e.status === 'completed').length;
-    const totalRevenue = total * 4999;
+    const totalRevenue = total * 3999;
     setStats({ total, active, completed, totalRevenue });
   };
 

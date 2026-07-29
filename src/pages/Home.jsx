@@ -322,8 +322,8 @@ const Home = () => {
                 to="/enrollment"
                 className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-white text-primary-700 font-display font-bold text-base sm:text-lg rounded-2xl hover:shadow-2xl hover:shadow-black/20 hover:-translate-y-1 transition-all duration-300 text-center"
               >
-                Enroll Now - ₹4,999
-              </Link>
+                Enroll Now - ₹3,999
+               </Link>
               <Link
                 to="/contact"
                 className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 border-2 border-white/30 text-white font-display font-semibold text-base sm:text-lg rounded-2xl hover:bg-white/10 hover:border-white/50 transition-all duration-300 text-center"
@@ -386,7 +386,7 @@ const HeroSection = () => {
 
               <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 mb-8 sm:mb-12 max-w-md sm:max-w-none mx-auto sm:mx-0">
                 <Link to="/enrollment" className="btn-accent text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 text-center">
-                  Enroll Now - ₹4,999
+                Enroll Now - ₹3,999
                   <FiArrowRight className="inline ml-2 w-4 h-4 sm:w-5 sm:h-5" />
                 </Link>
                 <Link to="/programs" className="px-6 sm:px-8 py-3 sm:py-4 border-2 border-white/30 text-white font-semibold rounded-xl hover:bg-white/10 hover:border-white/50 transition-all duration-300 text-center text-base sm:text-lg">

@@ -44,10 +44,10 @@ const Footer = () => {
   ];
 
   const programs = [
-    { name: 'MERN Stack', path: '/programs/mern' },
-    { name: 'Java Full Stack', path: '/programs/java' },
-    { name: 'Python Full Stack', path: '/programs/python' },
-    { name: 'React Native', path: '/programs/react-native' },
+    { name: 'MERN Web Project Development', path: '/programs/mern' },
+    { name: 'Java Application Project Development', path: '/programs/java' },
+    { name: 'Python Application Project Development', path: '/programs/python' },
+    { name: 'React Native Mobile App Project Development', path: '/programs/react-native' },
   ];
 
   return (

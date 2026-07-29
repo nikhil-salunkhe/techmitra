@@ -75,7 +75,7 @@ const Enrollment = () => {
 
   const steps = [
     { number: '01', title: 'Fill Enrollment Form', desc: 'Complete the registration form with your details' },
-    { number: '02', title: 'Pay ₹4,999', desc: 'One-time payment for the complete 2-month program' },
+    { number: '02', title: 'Pay ₹3,999', desc: 'One-time payment for the complete 2-month program' },
     { number: '03', title: 'Get Onboarded', desc: 'Receive welcome kit and access to learning dashboard' },
     { number: '04', title: 'Start Learning', desc: 'Begin your 2-month journey with live sessions and project development' },
   ];
@@ -97,7 +97,7 @@ const Enrollment = () => {
             <p className="text-xl font-bold text-primary-600">{enrollmentData?.id}</p>
           </div>
           <p className="text-dark-500 mb-6">
-            Thank you for enrolling in the <strong>2-Month Training Program (₹4,999)</strong> at TechMitra! 
+            Thank you for enrolling in the <strong>2-Month Training Program (₹3,999)</strong> at TechMitra! 
             A confirmation email has been sent to <strong>{enrollmentData?.email}</strong>. 
             Our team will contact you within 24 hours to confirm your batch schedule.
           </p>
@@ -141,7 +141,7 @@ const Enrollment = () => {
                   <FiDollarSign className="w-5 h-5 text-primary-500 mr-2" />
                   Training Plan
                 </h3>
-                <div className="text-3xl font-display font-bold text-primary-600 mb-1">₹4,999</div>
+                <div className="text-3xl font-display font-bold text-primary-600 mb-1">₹3,999</div>
                 <p className="text-dark-400 text-sm mb-4">Complete 2-month intensive training program</p>
                 <ul className="space-y-2 mb-4">
                   {[
@@ -231,7 +231,7 @@ const Enrollment = () => {
                 className="card p-8"
               >
                 <h2 className="text-2xl font-display font-bold text-dark-900 mb-2">Registration Form</h2>
-                <p className="text-dark-500 text-sm mb-8">Complete all required fields to enroll in our 2-month training program (₹4,999)</p>
+                <p className="text-dark-500 text-sm mb-8">Complete all required fields to enroll in our 2-month training program (₹3,999)</p>
 
                 {submitError && (
                   <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
@@ -368,10 +368,10 @@ const Enrollment = () => {
                         {...formik.getFieldProps('technology')}
                       >
                         <option value="">Select technology</option>
-                        <option value="MERN Stack">MERN Stack</option>
-                        <option value="Java Full Stack">Java Full Stack</option>
-                        <option value="Python Full Stack">Python Full Stack</option>
-                        <option value="React Native">React Native</option>
+                        <option value="MERN Web Project Development">MERN Web Project Development</option>
+                        <option value="Java Application Project Development">Java Application Project Development</option>
+                        <option value="Python Application Project Development">Python Application Project Development</option>
+                        <option value="React Native Mobile App Project Development">React Native Mobile App Project Development</option>
                       </select>
                       {formik.touched.technology && formik.errors.technology && (
                         <p className="text-red-500 text-xs mt-1">{formik.errors.technology}</p>
@@ -448,7 +448,7 @@ const Enrollment = () => {
                       </div>
                       <div className="flex items-center">
                         <FiDollarSign className="w-5 h-5 text-primary-600 mr-2" />
-                        <span className="text-sm font-bold text-primary-700">₹4,999 (One-time)</span>
+                        <span className="text-sm font-bold text-primary-700">₹3,999 (One-time)</span>
                       </div>
                     </div>
                   </div>
@@ -467,7 +467,7 @@ const Enrollment = () => {
                       {isSubmitting ? (
                         <>Processing...</>
                       ) : (
-                        <>Enroll Now - ₹4,999 <FiSend className="ml-2 w-4 h-4" /></>
+                        <>Enroll Now - ₹3,999 <FiSend className="ml-2 w-4 h-4" /></>
                       )}
                     </button>
                   </div>

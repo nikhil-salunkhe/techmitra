@@ -106,7 +106,7 @@ async function sendEnrollmentEmail(student) {
             <div class="details">
               <table>
                 <tr><td>Enrollment ID</td><td><span class="badge">${student.id}</span></td></tr>
-                <tr><td>Plan</td><td>Training Plan - ₹4,999</td></tr>
+                <tr><td>Plan</td><td>Training Plan - ₹3,999</td></tr>
                 <tr><td>Duration</td><td>2 Months</td></tr>
                 <tr><td>Technology</td><td>${student.technology}</td></tr>
                 <tr><td>Preferred Batch</td><td>${student.preferredBatch || 'To be confirmed'}</td></tr>
@@ -190,7 +190,7 @@ async function sendEnrollmentNotificationToAdmin(student) {
             <div style="text-align: center; margin-bottom: 20px;">
               <span class="badge">${student.id}</span>
               <span class="tag" style="margin-left: 8px;">${student.technology}</span>
-              <span class="tag" style="margin-left: 4px; background: #d1fae5; color: #059669;">₹4,999</span>
+              <span class="tag" style="margin-left: 4px; background: #d1fae5; color: #059669;">₹3,999</span>
             </div>
 
             <div class="section-title">👤 Personal Information</div>
@@ -216,7 +216,7 @@ async function sendEnrollmentNotificationToAdmin(student) {
             <div class="details">
               <table>
                 <tr><td>Technology</td><td><strong>${student.technology}</strong></td></tr>
-                <tr><td>Plan</td><td>Training Plan - ₹4,999</td></tr>
+                <tr><td>Plan</td><td>Training Plan - ₹3,999</td></tr>
                 <tr><td>Duration</td><td>2 Months</td></tr>
                 <tr><td>Preferred Batch</td><td>${student.preferredBatch || 'Not specified'}</td></tr>
                 <tr><td>Previous Knowledge</td><td>${student.previousKnowledge || 'Not specified'}</td></tr>
@@ -401,7 +401,7 @@ app.post('/api/enroll', async (req, res) => {
       preferredBatch: preferredBatch || '',
       message: message || '',
       plan: 'Training Plan',
-      amount: 4999,
+      amount: 3999,
       duration: '2 Months',
       status: 'active',
       createdAt: new Date(),
