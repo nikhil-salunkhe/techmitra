@@ -5,6 +5,12 @@ export const navLinks = [
     path: '/programs',
     megaMenu: [
       {
+        category: 'AI & Development',
+        items: [
+          { name: 'AI Through Development - 1 Month', path: '/programs/ai', icon: 'SiPython' },
+        ],
+      },
+      {
         category: 'Web Development',
         items: [
           { name: 'MERN Web Project Development', path: '/programs/mern', icon: 'SiMongodb' },
@@ -28,7 +34,7 @@ export const navLinks = [
 export const stats = [
   { value: '500+', label: 'Students Trained' },
   { value: '100+', label: 'Projects Completed' },
-  { value: '4', label: 'Technology Programs' },
+  { value: '5', label: 'Technology Programs' },
   { value: '100%', label: 'Online' },
 ];
 
@@ -96,6 +102,18 @@ export const whyTechMitra = [
 ];
 
 export const techPrograms = [
+  {
+    id: 'ai',
+    name: 'AI Through Development',
+    tagline: '1 Month Live Project Training Program',
+    icon: 'SiPython',
+    color: 'from-purple-500 to-pink-600',
+    duration: '1 Month',
+    projects: ['AI-Powered Chatbot', 'Smart Code Assistant', 'AI Content Generator'],
+    skills: ['GitHub Copilot', 'Cline AI', 'VS Code Setup', 'AI Code Generation', 'Debugging with AI', 'Refactoring with AI', 'Build & Deploy Live Projects', 'Git & GitHub'],
+    fee: '₹1,499',
+    enrolled: '50+',
+  },
   {
     id: 'mern',
     name: 'MERN Web Project Development',
@@ -234,14 +252,14 @@ export const faqData = [
   { q: 'What is TechMitra?', a: 'TechMitra is an online technology training company that helps BCA, BCS, BSc CS, BSc IT, MCA and MSc students build industry-oriented final year projects.' },
   { q: 'How is TechMitra different from other platforms?', a: 'Unlike other platforms that provide ready-made projects, we teach you to build projects from scratch. You learn the complete development lifecycle including requirement analysis, planning, design, development, testing, deployment and documentation.' },
   { q: 'Who can join TechMitra programs?', a: 'Any college student pursuing BCA, BCS, BSc CS, BSc IT, MCA, MSc or equivalent degrees can join our programs.' },
-  { q: 'Which technologies do you teach?', a: 'We offer programs in MERN Web Project Development, Java Application Project Development, Python Application Project Development, and React Native Mobile App Project Development.' },
+  { q: 'Which technologies do you teach?', a: 'We offer programs in AI Through Development, MERN Web Project Development, Java Application Project Development, Python Application Project Development, and React Native Mobile App Project Development.' },
   { q: 'How are classes conducted?', a: 'All classes are conducted online via live interactive sessions. You can attend from anywhere and get real-time doubt clearing.' },
   { q: 'Will I build my own project?', a: 'Yes! Under mentor guidance, you will build your own final year project from scratch. This ensures you understand every aspect of your project.' },
-  { q: 'How long is the program?', a: 'Our programs are 2 months (8 weeks) long, designed to be intensive and comprehensive.' },
-  { q: 'What kind of projects can I build?', a: 'You can choose from 10+ project categories including E-Commerce, Hospital Management, AI Chatbot, Social Media App, and more.' },
+  { q: 'How long is the program?', a: 'We offer 1-month (AI Through Development) and 2-month programs, designed to be intensive and comprehensive.' },
+  { q: 'What kind of projects can I build?', a: 'You can choose from 10+ project categories including E-Commerce, Hospital Management, AI Chatbot, Social Media App, AI-Powered Tools, and more.' },
   { q: 'Do I get a certificate?', a: 'Yes, you receive a verified certificate after successfully completing the program and your project.' },
   { q: 'Is there any placement assistance?', a: 'We provide resume guidance, LinkedIn profile optimization, GitHub portfolio building, and mock interview preparation.' },
-  { q: 'What is the fee structure?', a: 'Our course fee is ₹3,999 for each program. Check our Enrollment page for detailed pricing.' },
+  { q: 'What is the fee structure?', a: 'Our course fee starts at ₹1,499 for the AI Through Development program and ₹3,999 for 2-month programs. Check our Enrollment page for detailed pricing.' },
   { q: 'Can I pay in installments?', a: 'Yes, we offer flexible installment options. Contact us for more details.' },
   { q: 'Do I need prior coding experience?', a: 'Basic programming knowledge is helpful but not mandatory. We start from fundamentals and build up to advanced concepts.' },
   { q: 'How are mentors assigned?', a: 'You are assigned a dedicated mentor based on your technology choice. Mentors are industry professionals with 5+ years of experience.' },

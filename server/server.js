@@ -25,6 +25,10 @@ mongoose.connect(MONGO_URI)
 app.use(cors());
 app.use(bodyParser.json());
 
+// Site URLs
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://techmitr.netlify.app';
+const API_URL = process.env.API_URL || 'https://techmitra-ggae.onrender.com';
+
 // Path to subscriptions data file (keep JSON for subscriptions)
 const SUBSCRIPTION_FILE = path.join(__dirname, 'data', 'subscriptions.json');
 
@@ -55,191 +59,360 @@ function writeSubscriptions(subscriptions) {
 }
 
 // Email transporter configuration
+// IMPORTANT: Gmail SMTP requires the 'from' address to match the authenticated account
+const EMAIL_USER = 'nsalunkhe803@gmail.com';
+const EMAIL_PASS = 'lnigofxvhntzawtq';   // App password
+const ADMIN_EMAIL = 'techmitraofficial@gmail.com';  // Correct admin contact email
+
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 587,
   secure: false,
   auth: {
-    user: 'nsalunkhe803@gmail.com', 
-    pass: 'lnigofxvhntzawtq',    // App password
+    user: EMAIL_USER, 
+    pass: EMAIL_PASS,
   },
 });
+
+// Format amount in Indian Rupees format
+function formatINR(amount) {
+  return `₹${Number(amount || 0).toLocaleString('en-IN')}`;
+}
+
+// Generate HTML for a detail row (email-safe with inline styles)
+function detailRow(label, value, isLast = false) {
+  return `
+    <tr>
+      <td style="padding: 10px 12px; border-bottom: ${isLast ? 'none' : '1px solid #e5e7eb'}; font-size: 14px; font-weight: 600; color: #6b7280; width: 40%; vertical-align: top;">${label}</td>
+      <td style="padding: 10px 12px; border-bottom: ${isLast ? 'none' : '1px solid #e5e7eb'}; font-size: 14px; color: #1f2937; vertical-align: top; word-break: break-word;">${value}</td>
+    </tr>
+  `;
+}
 
 // Send enrollment confirmation email to student
 async function sendEnrollmentEmail(student) {
   const mailOptions = {
-    from: '"TechMitra Training" <noreply@techmitra.com>',
+    from: `"TechMitra Training" <${EMAIL_USER}>`,
     to: student.email,
-    subject: '🎉 Enrollment Successful - Welcome to TechMitra Training!',
-    html: `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <style>
-          body { font-family: Arial, sans-serif; background: #f4f7fa; margin: 0; padding: 0; }
-          .container { max-width: 600px; margin: 20px auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-          .header { background: linear-gradient(135deg, #1e3a5f, #2563eb); padding: 30px; text-align: center; }
-          .header h1 { color: #ffffff; margin: 0; font-size: 24px; }
-          .header p { color: #bfdbfe; margin: 8px 0 0; }
-          .body { padding: 30px; }
-          .body h2 { color: #1e3a5f; font-size: 20px; margin-top: 0; }
-          .details { background: #f8fafc; border-radius: 8px; padding: 20px; margin: 20px 0; }
-          .details table { width: 100%; border-collapse: collapse; }
-          .details td { padding: 8px 12px; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
-          .details td:first-child { font-weight: 600; color: #475569; width: 40%; }
-          .details td:last-child { color: #1e293b; }
-          .badge { display: inline-block; background: #2563eb; color: #ffffff; padding: 6px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; }
-          .footer { background: #f1f5f9; padding: 20px; text-align: center; color: #64748b; font-size: 13px; }
-          .btn { display: inline-block; background: #2563eb; color: #ffffff; text-decoration: none; padding: 10px 24px; border-radius: 6px; font-weight: 600; margin-top: 15px; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>🎉 Welcome to TechMitra!</h1>
-            <p>Your training journey begins now</p>
-          </div>
-          <div class="body">
-            <h2>Hello ${student.fullName},</h2>
-            <p>Thank you for enrolling in our <strong>2-Month Intensive Training Program</strong>. We're excited to have you on board!</p>
-            
-            <div class="details">
-              <table>
-                <tr><td>Enrollment ID</td><td><span class="badge">${student.id}</span></td></tr>
-                <tr><td>Plan</td><td>Training Plan - ₹3,999</td></tr>
-                <tr><td>Duration</td><td>2 Months</td></tr>
-                <tr><td>Technology</td><td>${student.technology}</td></tr>
-                <tr><td>Preferred Batch</td><td>${student.preferredBatch || 'To be confirmed'}</td></tr>
-                <tr><td>Status</td><td style="color: #16a34a; font-weight: 600;">✅ Active</td></tr>
+    subject: `🎉 Enrollment Confirmed - ${student.plan} (${student.id})`,
+    html: `<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="x-apple-disable-message-reformatting">
+  <title>Enrollment Confirmed - TechMitra</title>
+  <!--[if mso]>
+    <noscript>
+      <xml>
+        <o:OfficeDocumentSettings>
+          <o:PixelsPerInch>96</o:PixelsPerInch>
+        </o:OfficeDocumentSettings>
+      </xml>
+    </noscript>
+  <![endif]-->
+  <style>
+    @media only screen and (max-width: 620px) {
+      .container { width: 100% !important; }
+      .inner-body { width: 100% !important; padding: 0 10px !important; }
+      .content { padding: 15px !important; }
+      .header { padding: 20px 15px !important; }
+      .btn { display: block !important; width: 100% !important; text-align: center !important; box-sizing: border-box !important; margin-bottom: 8px !important; }
+      .footer { padding: 15px !important; }
+      .logo-text { font-size: 20px !important; }
+    }
+    @media only screen and (max-width: 480px) {
+      .plan-box { padding: 12px !important; }
+      .details-table td { padding: 8px 10px !important; font-size: 13px !important; }
+      .next-box { padding: 12px !important; font-size: 13px !important; }
+      .header h1 { font-size: 22px !important; }
+      .header p { font-size: 13px !important; }
+    }
+  </style>
+</head>
+<body style="margin:0; padding:0; background-color:#e8edf3; font-family:'Segoe UI', Arial, Helvetica, sans-serif; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#e8edf3; padding:20px 0;">
+    <tr>
+      <td align="center" style="padding:20px 10px;">
+        <!-- Outer Container -->
+        <table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:100%; margin:0 auto; background-color:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 6px 30px rgba(0,0,0,0.08);">
+          <tr>
+            <td>
+              <!-- Header -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#1e3a8a; background:linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);">
+                <tr>
+                  <td align="center" style="padding:30px 20px;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td align="center">
+                          <div style="display:inline-block; width:56px; height:56px; background:#ffffff; border-radius:14px; text-align:center; line-height:56px; margin-bottom:10px;">
+                            <span style="color:#2563eb; font-size:26px; font-weight:800;">TM</span>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td align="center">
+                          <h1 style="color:#ffffff; font-size:24px; font-weight:700; margin:10px 0 4px 0;">🎉 Enrollment Confirmed!</h1>
+                          <p style="color:#bfdbfe; font-size:14px; margin:0;">Your training journey with TechMitra begins now</p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
               </table>
-            </div>
+              
+              <!-- Body -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="content" style="padding:30px;">
+                <tr>
+                  <td style="padding:30px; font-size:15px; line-height:1.7; color:#374151;">
+                    <h2 style="color:#1e3a5f; font-size:20px; margin:0 0 12px 0;">Hello ${student.fullName},</h2>
+                    <p style="margin:0 0 16px 0;">Thank you for enrolling in <strong style="color:#2563eb;">${student.plan}</strong> at TechMitra. Your seat has been successfully reserved!</p>
+                    
+                    <!-- Plan Summary Box -->
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%); border:2px solid #bfdbfe; border-radius:12px; margin-bottom:20px;">
+                      <tr>
+                        <td style="padding:16px 20px;">
+                          <h3 style="margin:0 0 10px 0; color:#1e3a5f; font-size:15px; font-weight:700;">✅ Your Enrollment Summary</h3>
+                          <p style="margin:4px 0; color:#1e3a5f; font-size:14px;">📋 <strong>Plan:</strong> ${student.plan}</p>
+                          <p style="margin:4px 0; color:#1e3a5f; font-size:14px;">💰 <strong>Training Fee:</strong> <span style="font-size:16px; font-weight:700; color:#059669;">${formatINR(student.amount)}</span></p>
+                          <p style="margin:4px 0; color:#1e3a5f; font-size:14px;">⏳ <strong>Duration:</strong> ${student.duration}</p>
+                        </td>
+                      </tr>
+                    </table>
+                    
+                    <!-- Details Table -->
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="details-table" style="width:100%; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; margin-bottom:20px; border-collapse:collapse;">
+                      <tr>
+                        <td style="padding:14px 16px; background:#f1f5f9; border-bottom:1px solid #e2e8f0;">
+                          <strong style="color:#1e293b; font-size:14px;">📋 Enrollment Details</strong>
+                        </td>
+                      </tr>
+                      <tr><td><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse; padding:0;">
+                        ${detailRow('Enrollment ID', `<span style="display:inline-block; background:#2563eb; color:#ffffff; padding:4px 12px; border-radius:20px; font-size:13px; font-weight:700;">${student.id}</span>`)}
+                        ${detailRow('Plan', `<strong>${student.plan}</strong>`)}
+                        ${detailRow('Training Fee', `<strong>${formatINR(student.amount)}</strong>`)}
+                        ${detailRow('Duration', student.duration)}
+                        ${detailRow('Technology / Track', `<strong>${student.technology}</strong>`)}
+                        ${detailRow('Full Name', student.fullName)}
+                        ${detailRow('Email', student.email)}
+                        ${detailRow('Phone', student.phone)}
+                        ${detailRow('College/University', student.college)}
+                        ${detailRow('Course/Degree', `${student.course} - ${student.year}`)}
+                        ${detailRow('City', student.city)}
+                        ${detailRow('Preferred Batch', student.preferredBatch || 'To be confirmed')}
+                        ${detailRow('Learning Mode', '100% Live Online Sessions')}
+                        ${detailRow('Status', `<span style="display:inline-block; background:#d1fae5; color:#059669; padding:2px 10px; border-radius:20px; font-size:12px; font-weight:700;">✅ ACTIVE</span>`, true)}
+                      </table></td></tr>
+                    </table>
 
-            <h3>📋 What's Next?</h3>
-            <ol style="color: #334155; line-height: 1.8;">
-              <li>Our team will contact you within 24 hours to confirm your batch schedule.</li>
-              <li>You'll receive access to our learning dashboard and course materials.</li>
-              <li>Live sessions will begin as per your preferred batch timing.</li>
-              <li>Start building your project with 1-on-1 mentorship.</li>
-            </ol>
+                    <!-- Next Steps -->
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="next-box" style="background:#fffbeb; border-left:4px solid #f59e0b; border-radius:8px; margin-bottom:20px;">
+                      <tr>
+                        <td style="padding:16px 20px; font-size:14px; color:#78350f; line-height:1.8;">
+                          <strong style="font-size:14px;">📋 What's Next?</strong>
+                          <ol style="margin:8px 0 0 0; padding-left:20px;">
+                            <li>Our team will contact you within <strong>24 hours</strong> to confirm your batch.</li>
+                            <li>You'll receive access to learning materials and session links.</li>
+                            <li>Live sessions will begin as per your preferred batch timing.</li>
+                            <li>Start building your project with 1-on-1 mentorship.</li>
+                          </ol>
+                        </td>
+                      </tr>
+                    </table>
 
-            <p style="text-align: center;">
-              <a href="https://techmitra.com/dashboard" class="btn">Access Dashboard</a>
-            </p>
+                    <!-- Buttons -->
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td align="center" style="padding:8px 0;">
+                          <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
+                            <tr>
+                              <td style="border-radius:8px;">
+                                <a href="${FRONTEND_URL}/enrollment" class="btn" style="display:inline-block; background:#2563eb; color:#ffffff; text-decoration:none; padding:12px 28px; border-radius:8px; font-weight:600; font-size:14px; margin-right:6px;">🌐 Visit Website</a>
+                              </td>
+                              <td style="border-radius:8px;">
+                                <a href="https://wa.me/919764149564" class="btn" style="display:inline-block; background:#059669; color:#ffffff; text-decoration:none; padding:12px 28px; border-radius:8px; font-weight:600; font-size:14px; margin-left:6px;">💬 WhatsApp Us</a>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
 
-            <p style="color: #64748b; font-size: 14px; margin-top: 20px;">
-              If you have any questions, feel free to reply to this email or contact us at techmitrofficial@gmail.com
-            </p>
-          </div>
-          <div class="footer">
-            <p>TechMitra Training Solutions | Building Future Tech Leaders</p>
-            <p>📍 Mumbai, India | 📧 techmitrofficial@gmail.com | 📞 +91 97641 49564</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `,
+                    <p style="color:#6b7280; font-size:13px; margin:20px 0 0 0; line-height:1.6;">
+                      If you have any questions, feel free to reply to this email, call us at <strong>+91 97641 49564</strong>, or email us at <strong>techmitrofficial@gmail.com</strong>.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Footer -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="footer" style="background:#f1f5f9; padding:24px;">
+                <tr>
+                  <td align="center" style="padding:24px 20px; font-size:13px; color:#64748b; line-height:1.8;">
+                    <p style="margin:0; font-weight:600; color:#1e293b;">TechMitra Training Solutions | Building Future Tech Leaders</p>
+                    <p style="margin:4px 0;">📍 India (Online) | 📧 techmitrofficial@gmail.com | 📞 +91 97641 49564</p>
+                    <p style="margin:4px 0;">🌐 <a href="${FRONTEND_URL}" style="color:#2563eb; text-decoration:none;">${FRONTEND_URL.replace('https://', '')}</a></p>
+                    <p style="margin:8px 0 0 0; font-size:11px; color:#94a3b8;">You received this email because you enrolled in a TechMitra training program.</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`,
   };
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log(`✅ Enrollment email sent to ${student.email}`);
-    return true;
+    console.log(`✅ Enrollment confirmation email sent to ${student.email}`);
+    return { success: true };
   } catch (error) {
     console.log(`⚠️ Email sending failed: ${error.message}`);
-    return false;
+    return { 
+      success: false, 
+      error: error.message,
+      fullError: `Address not found\n\nYour message wasn't delivered to ${student.email} because the address couldn't be found or is unable to receive email.\n\nThe response from the remote server was:\n${error.message}`
+    };
   }
 }
 
 // Send enrollment notification to admin
 async function sendEnrollmentNotificationToAdmin(student) {
+  const adminUrl = `${FRONTEND_URL}/admin`;
   const mailOptions = {
-    from: '"TechMitra System" <noreply@techmitra.com>',
-    to: 'techmitrofficial@gmail.com',
-    subject: `🆕 New Enrollment - ${student.fullName} (${student.id})`,
-    html: `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <style>
-          body { font-family: Arial, sans-serif; background: #f4f7fa; margin: 0; padding: 0; }
-          .container { max-width: 600px; margin: 20px auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-          .header { background: linear-gradient(135deg, #059669, #2563eb); padding: 30px; text-align: center; }
-          .header h1 { color: #ffffff; margin: 0; font-size: 24px; }
-          .header p { color: #d1fae5; margin: 8px 0 0; }
-          .body { padding: 30px; }
-          .body h2 { color: #1e3a5f; font-size: 20px; margin-top: 0; }
-          .section-title { background: #f8fafc; padding: 10px 16px; border-radius: 8px; font-weight: 600; color: #1e293b; margin: 20px 0 10px; font-size: 14px; }
-          .details { background: #f8fafc; border-radius: 8px; padding: 20px; margin: 10px 0; }
-          .details table { width: 100%; border-collapse: collapse; }
-          .details td { padding: 8px 12px; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
-          .details td:first-child { font-weight: 600; color: #475569; width: 35%; }
-          .details td:last-child { color: #1e293b; }
-          .badge { display: inline-block; background: #059669; color: #ffffff; padding: 6px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; }
-          .tag { display: inline-block; background: #dbeafe; color: #1d4ed8; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
-          .footer { background: #f1f5f9; padding: 20px; text-align: center; color: #64748b; font-size: 13px; }
-          .highlight { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px 16px; border-radius: 4px; margin: 15px 0; font-size: 13px; color: #92400e; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>🆕 New Enrollment Received</h1>
-            <p>A student has just enrolled at TechMitra</p>
-          </div>
-          <div class="body">
-            <div style="text-align: center; margin-bottom: 20px;">
-              <span class="badge">${student.id}</span>
-              <span class="tag" style="margin-left: 8px;">${student.technology}</span>
-              <span class="tag" style="margin-left: 4px; background: #d1fae5; color: #059669;">₹3,999</span>
-            </div>
-
-            <div class="section-title">👤 Personal Information</div>
-            <div class="details">
-              <table>
-                <tr><td>Full Name</td><td><strong>${student.fullName}</strong></td></tr>
-                <tr><td>Email</td><td><a href="mailto:${student.email}" style="color: #2563eb;">${student.email}</a></td></tr>
-                <tr><td>Phone</td><td><a href="tel:${student.phone}" style="color: #2563eb;">${student.phone}</a></td></tr>
-                <tr><td>City</td><td>${student.city}</td></tr>
+    from: `"TechMitra System" <${EMAIL_USER}>`,
+    to: ADMIN_EMAIL,
+    subject: `🆕 New Enrollment - ${student.fullName} (${student.id}) - ${student.plan}`,
+    html: `<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="x-apple-disable-message-reformatting">
+  <title>New Enrollment Notification - TechMitra</title>
+  <style>
+    @media only screen and (max-width: 620px) {
+      .container { width: 100% !important; }
+      .content { padding: 15px !important; }
+      .header { padding: 20px 15px !important; }
+      .section-title { padding: 8px 12px !important; font-size: 13px !important; }
+      .admin-box { padding: 15px !important; }
+      .btn { display: block !important; width: 100% !important; text-align: center !important; box-sizing: border-box !important; }
+      .footer { padding: 15px !important; }
+      .tag-row { display: block !important; margin-bottom: 8px !important; margin-left: 0 !important; }
+    }
+  </style>
+</head>
+<body style="margin:0; padding:0; background-color:#e8edf3; font-family:'Segoe UI', Arial, Helvetica, sans-serif; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#e8edf3; padding:20px 0;">
+    <tr>
+      <td align="center" style="padding:20px 10px;">
+        <table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:100%; margin:0 auto; background-color:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 6px 30px rgba(0,0,0,0.08);">
+          <tr>
+            <td>
+              <!-- Header -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#059669; background:linear-gradient(135deg, #059669 0%, #2563eb 100%);">
+                <tr>
+                  <td align="center" class="header" style="padding:30px 20px;">
+                    <h1 style="color:#ffffff; font-size:24px; font-weight:700; margin:0 0 4px 0;">🆕 New Enrollment Received</h1>
+                    <p style="color:#d1fae5; font-size:14px; margin:0;">A new student has just enrolled at TechMitra</p>
+                  </td>
+                </tr>
               </table>
-            </div>
 
-            <div class="section-title">🎓 Academic Details</div>
-            <div class="details">
-              <table>
-                <tr><td>College/University</td><td>${student.college}</td></tr>
-                <tr><td>Course/Degree</td><td>${student.course}</td></tr>
-                <tr><td>Year of Study</td><td>${student.year}</td></tr>
+              <!-- Body -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="content" style="padding:30px;">
+                <tr>
+                  <td style="padding:30px; font-size:15px; color:#374151;">
+                    <!-- Tags Row -->
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:16px;">
+                      <tr>
+                        <td align="center" style="padding:8px 0;">
+                          <span style="display:inline-block; background:#059669; color:#ffffff; padding:6px 16px; border-radius:20px; font-size:14px; font-weight:700; margin-right:4px;">${student.id}</span>
+                          <span class="tag-row" style="display:inline-block; background:#dbeafe; color:#1d4ed8; padding:4px 12px; border-radius:12px; font-size:12px; font-weight:500; margin-left:4px;">${student.technology}</span>
+                          <span class="tag-row" style="display:inline-block; background:#d1fae5; color:#059669; padding:4px 12px; border-radius:12px; font-size:12px; font-weight:600; margin-left:4px;">${formatINR(student.amount)}</span>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <!-- Personal Information -->
+                    <p class="section-title" style="background:#f1f5f9; padding:10px 16px; border-radius:8px; font-weight:700; color:#1e293b; margin:20px 0 10px 0; font-size:14px;">👤 Personal Information</p>
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f8fafc; border-radius:8px; padding:0; border:1px solid #e2e8f0; border-collapse:collapse;">
+                      <tr><td><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+                        ${detailRow('Full Name', `<strong>${student.fullName}</strong>`)}
+                        ${detailRow('Email', `<a href="mailto:${student.email}" style="color:#2563eb;">${student.email}</a>`)}
+                        ${detailRow('Phone', `<a href="tel:${student.phone}" style="color:#2563eb;">${student.phone}</a>`)}
+                        ${detailRow('City', student.city, true)}
+                      </table></td></tr>
+                    </table>
+
+                    <!-- Academic Details -->
+                    <p class="section-title" style="background:#f1f5f9; padding:10px 16px; border-radius:8px; font-weight:700; color:#1e293b; margin:20px 0 10px 0; font-size:14px;">🎓 Academic Details</p>
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f8fafc; border-radius:8px; padding:0; border:1px solid #e2e8f0; border-collapse:collapse;">
+                      <tr><td><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+                        ${detailRow('College/University', student.college)}
+                        ${detailRow('Course/Degree', student.course)}
+                        ${detailRow('Year of Study', student.year, true)}
+                      </table></td></tr>
+                    </table>
+
+                    <!-- Program Details -->
+                    <p class="section-title" style="background:#f1f5f9; padding:10px 16px; border-radius:8px; font-weight:700; color:#1e293b; margin:20px 0 10px 0; font-size:14px;">📋 Program & Plan Details</p>
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f8fafc; border-radius:8px; padding:0; border:1px solid #e2e8f0; border-collapse:collapse;">
+                      <tr><td><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+                        ${detailRow('Plan', `<strong>${student.plan}</strong>`)}
+                        ${detailRow('Technology / Track', `<strong>${student.technology}</strong>`)}
+                        ${detailRow('Training Fee', `<strong style="color:#059669;">${formatINR(student.amount)}</strong>`)}
+                        ${detailRow('Duration', student.duration)}
+                        ${detailRow('Preferred Batch', student.preferredBatch || 'Not specified')}
+                        ${detailRow('Previous Knowledge', student.previousKnowledge || 'Not specified')}
+                        ${detailRow('Project Idea', student.projectIdea || 'Not specified')}
+                        ${detailRow('Message', student.message || 'No message')}
+                        ${detailRow('Enrolled At', new Date(student.createdAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'full', timeStyle: 'short' }))}
+                        ${detailRow('Status', `<span style="display:inline-block; background:#d1fae5; color:#059669; padding:2px 10px; border-radius:20px; font-size:12px; font-weight:700;">✅ ACTIVE</span>`, true)}
+                      </table></td></tr>
+                    </table>
+
+                    ${student.message ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:15px 0;"><tr><td style="background:#fef3c7; border-left:4px solid #f59e0b; padding:12px 16px; border-radius:4px; font-size:13px; color:#92400e;">📝 <strong>Student Message:</strong> ${student.message}</td></tr></table>` : ''}
+
+                    <!-- Admin Login Box -->
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="admin-box" style="margin-top:24px; background:#eff6ff; border:2px solid #bfdbfe; border-radius:10px;">
+                      <tr>
+                        <td align="center" style="padding:20px;">
+                          <p style="margin:0 0 8px 0; color:#1e3a5f; font-weight:700; font-size:14px;">🔐 Admin Login to Manage This Enrollment</p>
+                          <p style="margin:0 0 12px 0; font-size:12px; color:#475569;">Use the button below to open the Admin Panel. If you're not logged in, you'll be redirected to the login page.</p>
+                          <a href="${adminUrl}" class="btn" style="display:inline-block; background:#2563eb; color:#ffffff; text-decoration:none; padding:12px 32px; border-radius:8px; font-weight:700; font-size:14px;">🔐 View in Admin Panel</a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
               </table>
-            </div>
 
-            <div class="section-title">📋 Program Details</div>
-            <div class="details">
-              <table>
-                <tr><td>Technology</td><td><strong>${student.technology}</strong></td></tr>
-                <tr><td>Plan</td><td>Training Plan - ₹3,999</td></tr>
-                <tr><td>Duration</td><td>2 Months</td></tr>
-                <tr><td>Preferred Batch</td><td>${student.preferredBatch || 'Not specified'}</td></tr>
-                <tr><td>Previous Knowledge</td><td>${student.previousKnowledge || 'Not specified'}</td></tr>
-                <tr><td>Project Idea</td><td>${student.projectIdea || 'Not specified'}</td></tr>
-                <tr><td>Message</td><td>${student.message || 'No message'}</td></tr>
-                <tr><td>Enrolled At</td><td>${new Date(student.createdAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}</td></tr>
+              <!-- Footer -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="footer" style="background:#f1f5f9; padding:24px;">
+                <tr>
+                  <td align="center" style="padding:24px 20px; font-size:13px; color:#64748b; line-height:1.8;">
+                    <p style="margin:0; font-weight:600; color:#1e293b;">TechMitra Training Solutions | Building Future Tech Leaders</p>
+                    <p style="margin:4px 0;">📍 India (Online) | 📧 techmitrofficial@gmail.com | 📞 +91 97641 49564</p>
+                    <p style="margin:4px 0;">🌐 <a href="${FRONTEND_URL}" style="color:#2563eb; text-decoration:none;">${FRONTEND_URL.replace('https://', '')}</a></p>
+                  </td>
+                </tr>
               </table>
-            </div>
-
-            ${student.message ? `<div class="highlight">📝 <strong>Student Message:</strong> ${student.message}</div>` : ''}
-
-            <div style="text-align: center; margin-top: 20px;">
-              <a href="http://localhost:5173/admin" style="display: inline-block; background: #2563eb; color: #ffffff; text-decoration: none; padding: 10px 24px; border-radius: 6px; font-weight: 600;">View in Admin Panel</a>
-            </div>
-          </div>
-          <div class="footer">
-            <p>TechMitra Training Solutions | Building Future Tech Leaders</p>
-            <p>📍 Mumbai, India | 📧 techmitrofficial@gmail.com | 📞 +91 97641 49564</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `,
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`,
   };
 
   try {
@@ -257,57 +430,71 @@ async function sendEnrollmentNotificationToAdmin(student) {
 // Send subscription notification to admin
 async function sendSubscriptionNotification(subscriber) {
   const mailOptions = {
-    from: '"TechMitra Website" <noreply@techmitra.com>',
-    to: 'techmitrofficial@gmail.com',
+    from: `"TechMitra Website" <${EMAIL_USER}>`,
+    to: ADMIN_EMAIL,
     subject: '🎯 New Newsletter Subscription - TechMitra',
-    html: `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <style>
-          body { font-family: Arial, sans-serif; background: #f4f7fa; margin: 0; padding: 0; }
-          .container { max-width: 600px; margin: 20px auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-          .header { background: linear-gradient(135deg, #1e3a5f, #2563eb); padding: 30px; text-align: center; }
-          .header h1 { color: #ffffff; margin: 0; font-size: 24px; }
-          .header p { color: #bfdbfe; margin: 8px 0 0; }
-          .body { padding: 30px; }
-          .body h2 { color: #1e3a5f; font-size: 20px; margin-top: 0; }
-          .details { background: #f8fafc; border-radius: 8px; padding: 20px; margin: 20px 0; }
-          .details table { width: 100%; border-collapse: collapse; }
-          .details td { padding: 8px 12px; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
-          .details td:first-child { font-weight: 600; color: #475569; width: 30%; }
-          .details td:last-child { color: #1e293b; }
-          .badge { display: inline-block; background: #2563eb; color: #ffffff; padding: 6px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; }
-          .footer { background: #f1f5f9; padding: 20px; text-align: center; color: #64748b; font-size: 13px; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>🎯 New Subscriber!</h1>
-            <p>Someone just subscribed to TechMitra newsletter</p>
-          </div>
-          <div class="body">
-            <h2>Newsletter Subscription Details</h2>
-            <div class="details">
-              <table>
-                <tr><td>Email</td><td><span class="badge">${subscriber.email}</span></td></tr>
-                <tr><td>Subscribed At</td><td>${new Date(subscriber.subscribedAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}</td></tr>
-                <tr><td>Total Subscribers</td><td>${readSubscriptions().length}</td></tr>
+    html: `<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>New Subscriber - TechMitra</title>
+</head>
+<body style="margin:0; padding:0; background-color:#e8edf3; font-family:'Segoe UI', Arial, Helvetica, sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#e8edf3; padding:20px 0;">
+    <tr>
+      <td align="center" style="padding:20px 10px;">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px; max-width:100%; margin:0 auto; background-color:#ffffff; border-radius:16px; overflow:hidden; box-shadow:0 6px 30px rgba(0,0,0,0.08);">
+          <tr>
+            <td>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);">
+                <tr>
+                  <td align="center" style="padding:30px 20px;">
+                    <h1 style="color:#ffffff; font-size:24px; font-weight:700; margin:0 0 4px 0;">🎯 New Subscriber!</h1>
+                    <p style="color:#bfdbfe; font-size:14px; margin:0;">Someone just subscribed to TechMitra newsletter</p>
+                  </td>
+                </tr>
               </table>
-            </div>
-            <p style="color: #64748b; font-size: 14px; margin-top: 20px;">
-              This subscriber has joined the TechMitra mailing list. They will receive updates about new programs, offers, and tech insights.
-            </p>
-          </div>
-          <div class="footer">
-            <p>TechMitra Training Solutions | Building Future Tech Leaders</p>
-            <p>📍 Mumbai, India | 📧 techmitrofficial@gmail.com</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `,
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="padding:30px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; border-collapse:collapse;">
+                      <tr><td><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+                        <tr>
+                          <td style="padding:10px 12px; border-bottom:1px solid #e5e7eb; font-size:14px; font-weight:600; color:#6b7280; width:30%;">Email</td>
+                          <td style="padding:10px 12px; border-bottom:1px solid #e5e7eb; font-size:14px; color:#1f2937;"><strong>${subscriber.email}</strong></td>
+                        </tr>
+                        <tr>
+                          <td style="padding:10px 12px; border-bottom:1px solid #e5e7eb; font-size:14px; font-weight:600; color:#6b7280; width:30%;">Subscribed At</td>
+                          <td style="padding:10px 12px; border-bottom:1px solid #e5e7eb; font-size:14px; color:#1f2937;">${new Date(subscriber.subscribedAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}</td>
+                        </tr>
+                        <tr>
+                          <td style="padding:10px 12px; font-size:14px; font-weight:600; color:#6b7280; width:30%;">Total Subscribers</td>
+                          <td style="padding:10px 12px; font-size:14px; color:#1f2937;"><strong>${readSubscriptions().length}</strong></td>
+                        </tr>
+                      </table></td></tr>
+                    </table>
+                    <p style="color:#6b7280; font-size:14px; margin:20px 0 0 0; line-height:1.6;">This subscriber has joined the TechMitra mailing list. They will receive updates about new programs, offers, and tech insights.</p>
+                  </td>
+                </tr>
+              </table>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f1f5f9;">
+                <tr>
+                  <td align="center" style="padding:20px; font-size:13px; color:#64748b;">
+                    <p style="margin:0; font-weight:600; color:#1e293b;">TechMitra Training Solutions</p>
+                    <p style="margin:4px 0;">📍 India (Online) | 📧 techmitrofficial@gmail.com</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`,
   };
 
   try {
@@ -375,11 +562,30 @@ app.get('/api/subscriptions', (req, res) => {
 // POST /api/enroll - Create new enrollment
 app.post('/api/enroll', async (req, res) => {
   try {
-    const { fullName, email, phone, college, course, year, city, technology, projectIdea, previousKnowledge, preferredBatch, message } = req.body;
+    const { fullName, email, phone, college, course, year, city, technology, projectIdea, previousKnowledge, preferredBatch, message, planId, plan, duration } = req.body;
 
     // Validation
     if (!fullName || !email || !phone || !college || !course || !year || !city || !technology) {
       return res.status(400).json({ success: false, message: 'All required fields must be filled' });
+    }
+
+    // Determine plan details based on planId
+    let selectedPlan = 'Training Plan';
+    let selectedAmount = 3999;
+    let selectedDuration = '2 Months';
+
+    if (planId === 'ai') {
+      selectedPlan = plan || 'AI Through Development';
+      selectedAmount = 1499;
+      selectedDuration = duration || '1 Month';
+    } else if (planId === 'project') {
+      selectedPlan = plan || 'Project Development';
+      selectedAmount = 3999;
+      selectedDuration = duration || '2 Months';
+    } else {
+      selectedPlan = plan || 'Training Plan';
+      selectedAmount = 3999;
+      selectedDuration = duration || '2 Months';
     }
 
     // Count existing enrollments to generate ID
@@ -400,9 +606,9 @@ app.post('/api/enroll', async (req, res) => {
       previousKnowledge: previousKnowledge || '',
       preferredBatch: preferredBatch || '',
       message: message || '',
-      plan: 'Training Plan',
-      amount: 3999,
-      duration: '2 Months',
+      plan: selectedPlan,
+      amount: selectedAmount,
+      duration: selectedDuration,
       status: 'active',
       createdAt: new Date(),
     });
@@ -411,14 +617,25 @@ app.post('/api/enroll', async (req, res) => {
     await enrollment.save();
 
     // Send emails (non-blocking)
-    sendEnrollmentEmail(enrollment);
-    sendEnrollmentNotificationToAdmin(enrollment);
+    const emailResult = await sendEnrollmentEmail(enrollment);
+    await sendEnrollmentNotificationToAdmin(enrollment);
 
-    res.status(201).json({
+    const response = {
       success: true,
       message: 'Enrollment successful! Check your email for confirmation.',
       enrollment,
-    });
+    };
+
+    // If email failed, include error details in response
+    if (!emailResult.success) {
+      response.emailWarning = {
+        message: '⚠️ Email Delivery Issue',
+        details: emailResult.fullError,
+        note: 'Your enrollment was successful, but we encountered an issue sending the confirmation email. Please verify your email address is correct. You can still access your enrollment details through our website.'
+      };
+    }
+
+    res.status(201).json(response);
   } catch (error) {
     console.error('Enrollment error:', error);
     res.status(500).json({ success: false, message: 'Server error. Please try again.' });
@@ -487,4 +704,5 @@ app.delete('/api/enrollments/:id', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 TechMitra API Server running on http://localhost:${PORT}`);
   console.log(`📦 MongoDB: techmitra database`);
+  console.log(`🌐 Frontend URL: ${FRONTEND_URL}`);
 });

@@ -44,6 +44,7 @@ const Footer = () => {
   ];
 
   const programs = [
+    { name: 'AI Through Development', path: '/programs/ai' },
     { name: 'MERN Web Project Development', path: '/programs/mern' },
     { name: 'Java Application Project Development', path: '/programs/java' },
     { name: 'Python Application Project Development', path: '/programs/python' },

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import Navbar from './components/common/Navbar';
@@ -11,6 +11,7 @@ import Programs from './pages/Programs';
 import Enrollment from './pages/Enrollment';
 import Contact from './pages/Contact';
 import Admin from './pages/Admin';
+import AdminLogin from './pages/AdminLogin';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -18,6 +19,15 @@ function ScrollToTop() {
     window.scrollTo(0, 0);
   }, [pathname]);
   return null;
+}
+
+// Protected Route Component
+function ProtectedRoute({ children }) {
+  const isAuthenticated = sessionStorage.getItem('techmitra_admin') === 'authenticated';
+  if (!isAuthenticated) {
+    return <Navigate to="/admin/login" replace />;
+  }
+  return children;
 }
 
 function App() {
@@ -42,7 +52,15 @@ function App() {
           <Route path="/programs/:tech" element={<Programs />} />
           <Route path="/enrollment" element={<Enrollment />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/admin" element={<Admin />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <Admin />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
         <Chatbot />
       </main>

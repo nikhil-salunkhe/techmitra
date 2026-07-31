@@ -1,18 +1,80 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { FiCheck, FiArrowRight, FiSend, FiPhone, FiMail, FiShield, FiBook, FiAward, FiClock, FiCode, FiDollarSign, FiCalendar, FiUserCheck } from 'react-icons/fi';
+import { FiCheck, FiArrowRight, FiSend, FiPhone, FiMail, FiShield, FiBook, FiAward, FiClock, FiCode, FiDollarSign, FiCalendar, FiUserCheck, FiCpu } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
+const PLAN_TYPES = {
+  ai: {
+    id: 'ai',
+    label: 'AI Through Development',
+    shortLabel: 'AI Program',
+    fee: 1499,
+    feeLabel: '₹1,499',
+    duration: '1 Month',
+    description: '1-Month Live Project Training Program',
+    badge: '🔥 NEW',
+    techLabel: 'AI Technology Track',
+    benefits: [
+      'Build, Test & Deploy Live Projects with AI',
+      'Learn AI-Assisted Coding with GitHub Copilot',
+      'Smart Development with Cline AI',
+      'VS Code Setup & Productivity Booster',
+      'Code Generation, Debugging & Refactoring with AI',
+      'Git & GitHub for Version Control & Collaboration',
+      'Certificate of Completion',
+    ],
+    technologies: ['AI Through Development'],
+    steps: [
+      { number: '01', title: 'Fill Enrollment Form', desc: 'Complete the registration form with your details' },
+      { number: '02', title: 'Pay ₹1,499', desc: 'One-time payment for the complete 1-month program' },
+      { number: '03', title: 'Get Onboarded', desc: 'Receive welcome kit and join the AI training community' },
+      { number: '04', title: 'Start Learning', desc: 'Begin your 1-month AI journey with live sessions' },
+    ],
+  },
+  project: {
+    id: 'project',
+    label: 'Project Development',
+    shortLabel: '2-Month Program',
+    fee: 3999,
+    feeLabel: '₹3,999',
+    duration: '2 Months',
+    description: 'Complete 2-month intensive training program',
+    badge: 'BEST VALUE',
+    techLabel: 'Technology Stack',
+    benefits: [
+      '2 Months Live Online Sessions',
+      'Complete Project Development',
+      '1-on-1 Mentorship',
+      'Code Reviews & Feedback',
+      'Course Materials & Resources',
+      'GitHub Portfolio Building',
+      'Placement Preparation',
+      'Verified Certificate',
+    ],
+    technologies: ['MERN Web Project Development', 'Java Application Project Development', 'Python Application Project Development', 'React Native Mobile App Project Development'],
+    steps: [
+      { number: '01', title: 'Fill Enrollment Form', desc: 'Complete the registration form with your details' },
+      { number: '02', title: 'Pay ₹3,999', desc: 'One-time payment for the complete 2-month program' },
+      { number: '03', title: 'Get Onboarded', desc: 'Receive welcome kit and access to learning dashboard' },
+      { number: '04', title: 'Start Learning', desc: 'Begin your 2-month journey with live sessions and project development' },
+    ],
+  },
+};
+
 const Enrollment = () => {
   const [submitted, setSubmitted] = useState(false);
   const [enrollmentData, setEnrollmentData] = useState(null);
   const [submitError, setSubmitError] = useState('');
+  const [emailWarning, setEmailWarning] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState('project');
+
+  const plan = PLAN_TYPES[selectedPlan];
 
   const formik = useFormik({
     initialValues: {
@@ -28,6 +90,7 @@ const Enrollment = () => {
       previousKnowledge: '',
       preferredBatch: '',
       message: '',
+      planId: 'project',
     },
     validationSchema: Yup.object({
       fullName: Yup.string().required('Full name is required').min(3, 'Name must be at least 3 characters'),
@@ -43,15 +106,22 @@ const Enrollment = () => {
       setIsSubmitting(true);
       setSubmitError('');
       try {
+        const payload = {
+          ...values,
+          planId: selectedPlan,
+          plan: plan.label,
+          duration: plan.duration,
+        };
         const response = await fetch(`${API_URL}/api/enroll`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(values),
+          body: JSON.stringify(payload),
         });
         const data = await response.json();
         if (data.success) {
           setEnrollmentData(data.enrollment);
           setSubmitted(true);
+          setEmailWarning(data.emailWarning || null);
           resetForm();
         } else {
           setSubmitError(data.message || 'Something went wrong. Please try again.');
@@ -64,23 +134,29 @@ const Enrollment = () => {
     },
   });
 
+  const handlePlanChange = (planId) => {
+    setSelectedPlan(planId);
+    formik.setFieldValue('planId', planId);
+    formik.setFieldValue('technology', '');
+    const selectedTechnologies = PLAN_TYPES[planId].technologies;
+    if (selectedTechnologies.length === 1) {
+      formik.setFieldValue('technology', selectedTechnologies[0]);
+    }
+  };
+
   const benefits = [
     'Build your own final year project from scratch',
-    'Learn complete development lifecycle in 2 months',
+    'Learn complete development lifecycle',
     'Get 1-on-1 mentorship from industry experts',
     'Receive verified completion certificate',
     'Build GitHub portfolio with live projects',
     'Get placement and interview preparation',
   ];
 
-  const steps = [
-    { number: '01', title: 'Fill Enrollment Form', desc: 'Complete the registration form with your details' },
-    { number: '02', title: 'Pay ₹3,999', desc: 'One-time payment for the complete 2-month program' },
-    { number: '03', title: 'Get Onboarded', desc: 'Receive welcome kit and access to learning dashboard' },
-    { number: '04', title: 'Start Learning', desc: 'Begin your 2-month journey with live sessions and project development' },
-  ];
-
   if (submitted) {
+    const submittedPlan = enrollmentData?.plan || 'Training Plan';
+    const submittedFee = enrollmentData?.amount ? `₹${enrollmentData.amount.toLocaleString('en-IN')}` : 'Training Fee';
+    const submittedDuration = enrollmentData?.duration || 'Training Program';
     return (
       <div className="pt-20 min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-accent-50">
         <motion.div
@@ -97,10 +173,23 @@ const Enrollment = () => {
             <p className="text-xl font-bold text-primary-600">{enrollmentData?.id}</p>
           </div>
           <p className="text-dark-500 mb-6">
-            Thank you for enrolling in the <strong>2-Month Training Program (₹3,999)</strong> at TechMitra! 
-            A confirmation email has been sent to <strong>{enrollmentData?.email}</strong>. 
+            Thank you for enrolling in the <strong>{submittedPlan} ({submittedFee} / {submittedDuration})</strong> at TechMitra! 
+            {!emailWarning && <span>A confirmation email has been sent to <strong>{enrollmentData?.email}</strong>. </span>}
             Our team will contact you within 24 hours to confirm your batch schedule.
           </p>
+          
+          {emailWarning && (
+            <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-xl text-left">
+              <h4 className="text-yellow-800 font-semibold mb-2 flex items-center">
+                <span className="text-xl mr-2">⚠️</span>
+                {emailWarning.message}
+              </h4>
+              <div className="bg-white rounded-lg p-3 mb-3 border border-yellow-100">
+                <pre className="text-xs text-gray-700 whitespace-pre-wrap font-mono">{emailWarning.details}</pre>
+              </div>
+              <p className="text-sm text-yellow-700">{emailWarning.note}</p>
+            </div>
+          )}
           <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-3">
             <Link to="/" className="btn-primary">Back to Home</Link>
             <a href="https://wa.me/919764149564" target="_blank" rel="noopener noreferrer" className="btn-outline inline-flex items-center">
@@ -117,43 +206,75 @@ const Enrollment = () => {
       {/* Hero */}
       <section className="relative py-16 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-900 via-dark-900 to-primary-800" />
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-20 right-20 w-96 h-96 bg-primary-400 rounded-full blur-3xl" />
+        </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-5xl font-display font-bold text-white mb-4" data-aos="fade-up">
             Enroll at <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-accent-300">TechMitra</span>
           </h1>
           <p className="text-xl text-blue-200/80 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">
-            Start your journey to becoming industry-ready. Fill the form below and we'll guide you through the enrollment process.
+            Start your journey to becoming industry-ready. Choose your training plan and fill the form below to enroll.
           </p>
         </div>
       </section>
 
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Plan Selector */}
+          <div className="max-w-3xl mx-auto mb-12" data-aos="fade-up">
+            <h2 className="text-2xl font-display font-bold text-dark-900 text-center mb-6">Choose Your Training Plan</h2>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {Object.values(PLAN_TYPES).map((p) => (
+                <button
+                  key={p.id}
+                  onClick={() => handlePlanChange(p.id)}
+                  className={`relative p-6 rounded-2xl border-2 text-left transition-all duration-300 ${
+                    selectedPlan === p.id
+                      ? 'border-primary-500 bg-primary-50 shadow-lg'
+                      : 'border-gray-200 bg-white hover:border-primary-200 hover:shadow'
+                  }`}
+                >
+                  {p.badge && (
+                    <span className={`absolute top-0 right-0 text-white text-xs font-bold px-4 py-1 rounded-bl-xl ${
+                      p.id === 'ai' ? 'bg-gradient-to-r from-purple-500 to-pink-600' : 'bg-gradient-to-r from-primary-500 to-primary-700'
+                    }`}>
+                      {p.badge}
+                    </span>
+                  )}
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${p.id === 'ai' ? 'from-purple-500 to-pink-600' : 'from-primary-500 to-primary-700'} flex items-center justify-center mb-3`}>
+                    {p.id === 'ai' ? <FiCpu className="w-6 h-6 text-white" /> : <FiCode className="w-6 h-6 text-white" />}
+                  </div>
+                  <h3 className="text-lg font-display font-bold text-dark-900">{p.label}</h3>
+                  <p className="text-dark-400 text-sm mb-3">{p.description}</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-2xl font-display font-bold text-primary-600">{p.feeLabel}</span>
+                    <span className="flex items-center text-dark-500 text-sm">
+                      <FiClock className="w-4 h-4 mr-1" />
+                      {p.duration}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="grid lg:grid-cols-3 gap-12">
             {/* Left Sidebar */}
             <div className="lg:col-span-1">
               {/* Training Plan Card */}
-              <div className="card p-6 mb-6 border-2 border-primary-200 relative overflow-hidden" data-aos="fade-right">
-                <div className="absolute top-0 right-0 bg-gradient-to-r from-primary-500 to-primary-700 text-white text-xs font-bold px-4 py-1 rounded-bl-xl">
-                  BEST VALUE
+              <div className={`card p-6 mb-6 border-2 relative overflow-hidden ${selectedPlan === 'ai' ? 'border-purple-200' : 'border-primary-200'}`} data-aos="fade-right">
+                <div className={`absolute top-0 right-0 text-white text-xs font-bold px-4 py-1 rounded-bl-xl ${selectedPlan === 'ai' ? 'bg-gradient-to-r from-purple-500 to-pink-600' : 'bg-gradient-to-r from-primary-500 to-primary-700'}`}>
+                  {plan.badge}
                 </div>
                 <h3 className="text-lg font-display font-semibold text-dark-900 mb-2 flex items-center">
-                  <FiDollarSign className="w-5 h-5 text-primary-500 mr-2" />
-                  Training Plan
+                  <FiDollarSign className={`w-5 h-5 mr-2 ${selectedPlan === 'ai' ? 'text-purple-500' : 'text-primary-500'}`} />
+                  {plan.label}
                 </h3>
-                <div className="text-3xl font-display font-bold text-primary-600 mb-1">₹3,999</div>
-                <p className="text-dark-400 text-sm mb-4">Complete 2-month intensive training program</p>
+                <div className="text-3xl font-display font-bold text-primary-600 mb-1">{plan.feeLabel}</div>
+                <p className="text-dark-400 text-sm mb-4">{plan.description}</p>
                 <ul className="space-y-2 mb-4">
-                  {[
-                    '2 Months Live Online Sessions',
-                    'Complete Project Development',
-                    '1-on-1 Mentorship',
-                    'Code Reviews & Feedback',
-                    'Course Materials & Resources',
-                    'GitHub Portfolio Building',
-                    'Placement Preparation',
-                    'Verified Certificate',
-                  ].map(item => (
+                  {plan.benefits.map(item => (
                     <li key={item} className="flex items-start text-sm text-dark-600">
                       <FiCheck className="w-4 h-4 text-green-500 mt-0.5 mr-2 flex-shrink-0" />
                       {item}
@@ -189,7 +310,7 @@ const Enrollment = () => {
                   Enrollment Steps
                 </h3>
                 <div className="space-y-4">
-                  {steps.map((step) => (
+                  {plan.steps.map((step) => (
                     <div key={step.number} className="flex items-start">
                       <span className="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white text-xs font-bold">
                         {step.number}
@@ -219,6 +340,10 @@ const Enrollment = () => {
                     <FaWhatsapp className="w-4 h-4 mr-2 text-green-500" />
                     WhatsApp Us
                   </a>
+                  <a href="https://techmitr.netlify.app" target="_blank" rel="noopener noreferrer" className="flex items-center text-sm text-dark-600 hover:text-primary-600 transition-colors">
+                    <FiCode className="w-4 h-4 mr-2 text-primary-500" />
+                    www.techmitr.netlify.app
+                  </a>
                 </div>
               </div>
             </div>
@@ -231,7 +356,25 @@ const Enrollment = () => {
                 className="card p-8"
               >
                 <h2 className="text-2xl font-display font-bold text-dark-900 mb-2">Registration Form</h2>
-                <p className="text-dark-500 text-sm mb-8">Complete all required fields to enroll in our 2-month training program (₹3,999)</p>
+                <p className="text-dark-500 text-sm mb-8">Complete all required fields to enroll in the <strong>{plan.label}</strong> ({plan.feeLabel} / {plan.duration})</p>
+
+                {/* Selected Plan Summary */}
+                <div className={`mb-8 p-4 rounded-xl border ${selectedPlan === 'ai' ? 'bg-purple-50 border-purple-100' : 'bg-primary-50 border-primary-100'}`}>
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div className="flex items-center">
+                      {selectedPlan === 'ai' ? <FiCpu className="w-5 h-5 text-purple-600 mr-2" /> : <FiUserCheck className="w-5 h-5 text-primary-600 mr-2" />}
+                      <span className="text-sm font-medium text-dark-700">Selected Plan: <strong>{plan.label}</strong></span>
+                    </div>
+                    <div className="flex items-center">
+                      <FiCalendar className="w-5 h-5 text-primary-600 mr-2" />
+                      <span className="text-sm font-medium text-dark-700">{plan.duration} Duration</span>
+                    </div>
+                    <div className="flex items-center">
+                      <FiDollarSign className="w-5 h-5 text-primary-600 mr-2" />
+                      <span className="text-sm font-bold text-primary-700">{plan.feeLabel} (One-time)</span>
+                    </div>
+                  </div>
+                </div>
 
                 {submitError && (
                   <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
@@ -361,17 +504,16 @@ const Enrollment = () => {
 
                     {/* Technology */}
                     <div>
-                      <label className="block text-sm font-medium text-dark-700 mb-2">Technology *</label>
+                      <label className="block text-sm font-medium text-dark-700 mb-2">{plan.techLabel} *</label>
                       <select
                         name="technology"
                         className={`w-full px-4 py-3 rounded-xl border ${formik.touched.technology && formik.errors.technology ? 'border-red-400 focus:border-red-500' : 'border-gray-200 focus:border-primary-500'} bg-gray-50 focus:bg-white focus:outline-none transition-colors`}
                         {...formik.getFieldProps('technology')}
                       >
                         <option value="">Select technology</option>
-                        <option value="MERN Web Project Development">MERN Web Project Development</option>
-                        <option value="Java Application Project Development">Java Application Project Development</option>
-                        <option value="Python Application Project Development">Python Application Project Development</option>
-                        <option value="React Native Mobile App Project Development">React Native Mobile App Project Development</option>
+                        {plan.technologies.map(tech => (
+                          <option key={tech} value={tech}>{tech}</option>
+                        ))}
                       </select>
                       {formik.touched.technology && formik.errors.technology && (
                         <p className="text-red-500 text-xs mt-1">{formik.errors.technology}</p>
@@ -436,19 +578,19 @@ const Enrollment = () => {
                   </div>
 
                   {/* Plan Summary */}
-                  <div className="bg-gradient-to-r from-primary-50 to-blue-50 rounded-xl p-4 border border-primary-100">
+                  <div className={`rounded-xl p-4 border ${selectedPlan === 'ai' ? 'bg-purple-50 border-purple-100' : 'bg-gradient-to-r from-primary-50 to-blue-50 border-primary-100'}`}>
                     <div className="flex items-center justify-between flex-wrap gap-2">
                       <div className="flex items-center">
-                        <FiUserCheck className="w-5 h-5 text-primary-600 mr-2" />
-                        <span className="text-sm font-medium text-dark-700">Training Plan</span>
+                        {selectedPlan === 'ai' ? <FiCpu className="w-5 h-5 text-purple-600 mr-2" /> : <FiUserCheck className="w-5 h-5 text-primary-600 mr-2" />}
+                        <span className="text-sm font-medium text-dark-700">{plan.label}</span>
                       </div>
                       <div className="flex items-center">
                         <FiCalendar className="w-5 h-5 text-primary-600 mr-2" />
-                        <span className="text-sm font-medium text-dark-700">2 Months Duration</span>
+                        <span className="text-sm font-medium text-dark-700">{plan.duration} Duration</span>
                       </div>
                       <div className="flex items-center">
                         <FiDollarSign className="w-5 h-5 text-primary-600 mr-2" />
-                        <span className="text-sm font-bold text-primary-700">₹3,999 (One-time)</span>
+                        <span className="text-sm font-bold text-primary-700">{plan.feeLabel} (One-time)</span>
                       </div>
                     </div>
                   </div>
@@ -467,7 +609,7 @@ const Enrollment = () => {
                       {isSubmitting ? (
                         <>Processing...</>
                       ) : (
-                        <>Enroll Now - ₹3,999 <FiSend className="ml-2 w-4 h-4" /></>
+                        <>Enroll Now - {plan.feeLabel} <FiSend className="ml-2 w-4 h-4" /></>
                       )}
                     </button>
                   </div>

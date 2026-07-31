@@ -1,10 +1,38 @@
 import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiCheck, FiClock, FiUsers, FiStar, FiArrowRight, FiBook, FiTool, FiAward, FiCalendar, FiMonitor } from 'react-icons/fi';
-import { FaReact, FaJava, FaPython, FaNodeJs } from 'react-icons/fa';
+import { FiCheck, FiClock, FiUsers, FiStar, FiArrowRight, FiBook, FiTool, FiAward, FiCalendar, FiMonitor, FiCpu, FiCode, FiTerminal, FiGitBranch, FiCloud } from 'react-icons/fi';
+import { FaReact, FaJava, FaPython, FaNodeJs, FaGithub, FaCode } from 'react-icons/fa';
 
 const programsData = [
+  {
+    id: 'ai',
+    name: 'AI Through Development',
+    tagline: '1 Month Live Project Training Program',
+    icon: FiCpu,
+    color: 'from-purple-500 to-pink-600',
+    bgColor: 'from-purple-50 to-pink-50',
+    duration: '1 Month',
+    durationWeeks: 4,
+    fee: '₹1,499',
+    premiumFee: '₹1,499',
+    enrolled: '50+',
+    overview: '🚀 Learn AI-Powered Development and build real-world projects using VS Code, GitHub Copilot, and Cline AI. This 1-month intensive live project training program is designed to make you a smarter, faster developer by automating coding, debugging, refactoring, and deployment with AI.',
+    curriculum: [
+      { week: 'Week 1', title: 'AI-Assisted Coding & VS Code Setup', topics: ['VS Code Setup & Productivity', 'GitHub Copilot Basics', 'AI-Powered Code Suggestions', 'Claude AI / Cline AI Intro', 'Smart Shortcuts & Extensions', 'Workflow Optimization'] },
+      { week: 'Week 2', title: 'Code Generation & Debugging with AI', topics: ['AI Code Generation', 'Automated Debugging', 'Refactoring with AI', 'Code Completion Tools', 'Error Fixing with AI', 'Prompt Engineering for Code'] },
+      { week: 'Week 3', title: 'Build & Manage Projects with AI', topics: ['Git & GitHub for Version Control', 'Build Live Projects', 'AI-Assisted Project Setup', 'Collaboration with Copilot', 'Testing & QA with AI', 'Project Architecture'] },
+      { week: 'Week 4', title: 'Deploy & Launch', topics: ['Deploy Live Projects', 'CI/CD Basics', 'GitHub Actions', 'Project Documentation', 'Final Project Review', 'Certificate & Next Steps'] },
+    ],
+    projects: [
+      { name: 'AI-Powered Chatbot', desc: 'Build a smart conversational AI assistant with modern AI tools' },
+      { name: 'Smart Code Assistant', desc: 'Create your own AI coding helper integrated with VS Code' },
+      { name: 'AI Content Generator', desc: 'Develop an AI content generator for blogs, social media, and more' },
+    ],
+    skills: ['GitHub Copilot', 'Cline AI', 'VS Code Setup', 'AI Code Generation', 'Debugging with AI', 'Refactoring with AI', 'Build & Deploy Live Projects', 'Git & GitHub'],
+    prerequisites: 'No prior AI experience needed. Basic computer knowledge is sufficient - we teach everything from scratch!',
+    includes: 'Live Sessions, Hands-on AI Projects, Git & GitHub, Code Reviews, Certificate of Completion',
+  },
   {
     id: 'mern',
     name: 'MERN Web Project Development',

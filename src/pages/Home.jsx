@@ -5,8 +5,8 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
-import { FiArrowRight, FiCheck, FiStar, FiPlay, FiCode, FiServer, FiSmartphone, FiCloud, FiBook, FiUsers, FiAward, FiTrendingUp, FiClock } from 'react-icons/fi';
-import { FaReact, FaJava, FaPython, FaNodeJs, FaGithub } from 'react-icons/fa';
+import { FiArrowRight, FiCheck, FiStar, FiPlay, FiCode, FiServer, FiSmartphone, FiCloud, FiBook, FiUsers, FiAward, FiTrendingUp, FiClock, FiCpu } from 'react-icons/fi';
+import { FaReact, FaJava, FaPython, FaNodeJs, FaGithub, FaRobot } from 'react-icons/fa';
 import { whyTechMitra, techPrograms, projectLifecycle, studentJourney, featuredProjects, faqData } from '../data/navigation';
 
 // Section Wrapper
@@ -111,7 +111,7 @@ const Home = () => {
             title="Our Technology Programs"
             subtitle="Choose your path and build real-world projects with expert guidance"
           />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6">
             {techPrograms.map((program, index) => (
               <motion.div
                 key={program.id}
@@ -122,6 +122,7 @@ const Home = () => {
                 className="card group"
               >
                 <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br ${program.color} flex items-center justify-center mb-3 sm:mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                  {program.id === 'ai' && <FaRobot className="w-6 h-6 sm:w-7 sm:h-7 text-white" />}
                   {program.id === 'mern' && <FaNodeJs className="w-6 h-6 sm:w-7 sm:h-7 text-white" />}
                   {program.id === 'java' && <FaJava className="w-6 h-6 sm:w-7 sm:h-7 text-white" />}
                   {program.id === 'python' && <FaPython className="w-6 h-6 sm:w-7 sm:h-7 text-white" />}
@@ -322,7 +323,7 @@ const Home = () => {
                 to="/enrollment"
                 className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-white text-primary-700 font-display font-bold text-base sm:text-lg rounded-2xl hover:shadow-2xl hover:shadow-black/20 hover:-translate-y-1 transition-all duration-300 text-center"
               >
-                Enroll Now - ₹3,999
+                Enroll Now - from ₹1,499
                </Link>
               <Link
                 to="/contact"
@@ -330,6 +331,14 @@ const Home = () => {
               >
                 Talk to Advisor
               </Link>
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mt-4 sm:mt-6 text-xs sm:text-sm">
+              <span className="px-3 py-1.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-blue-100">
+                🚀 AI Through Development - ₹1,499 / 1 Month
+              </span>
+              <span className="px-3 py-1.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-blue-100">
+                💻 Project Development - ₹3,999 / 2 Months
+              </span>
             </div>
             <p className="text-blue-200 text-xs sm:text-sm mt-4 sm:mt-6">
               Limited seats available for the next batch. Enroll now!
@@ -369,7 +378,58 @@ const HeroSection = () => {
             >
               <div className="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/10 mb-4 sm:mb-6">
                 <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-400 rounded-full animate-pulse mr-1.5 sm:mr-2" />
-                <span className="text-blue-200 text-xs sm:text-sm font-medium">Now Enrolling - Next Batch Starts Soon</span>
+                <span className="text-blue-200 text-xs sm:text-sm font-medium">🔥 Limited Admissions Open - Enroll Now</span>
+              </div>
+              
+              {/* Plan Banners - Show Both New & Old Plans */}
+              <div className="space-y-2 sm:space-y-4 mb-4 sm:mb-6">
+                {/* New AI Plan Banner */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                  className="bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-purple-500/20 backdrop-blur-sm border border-purple-400/30 rounded-lg sm:rounded-2xl p-2.5 sm:p-4"
+                >
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-start sm:items-center">
+                      <FaRobot className="w-4 h-4 sm:w-6 sm:h-6 text-purple-300 mr-2 sm:mr-3 flex-shrink-0 mt-0.5 sm:mt-0" />
+                      <div className="text-left">
+                        <p className="text-white font-display font-bold text-xs sm:text-base leading-tight sm:leading-normal">🚀 AI THROUGH DEVELOPMENT – 1 MONTH LIVE PROJECT TRAINING!</p>
+                        <p className="text-purple-200 text-[10px] sm:text-sm mt-0.5 sm:mt-1">Learn AI-Powered Development with GitHub Copilot & Cline AI | Build, Test & Deploy Live Projects</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between pl-6 sm:pl-9">
+                      <span className="text-white font-display font-bold text-base sm:text-xl">₹1,499</span>
+                      <Link to="/programs/ai" className="px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-purple-700 font-semibold text-xs sm:text-sm rounded-lg hover:shadow-lg hover:bg-purple-50 transition-all whitespace-nowrap">
+                        LEARN MORE
+                      </Link>
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Existing Project Plan Banner */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.35 }}
+                  className="bg-gradient-to-r from-blue-500/20 via-cyan-500/20 to-blue-500/20 backdrop-blur-sm border border-blue-400/30 rounded-lg sm:rounded-2xl p-2.5 sm:p-4"
+                >
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-start sm:items-center">
+                      <FiCode className="w-4 h-4 sm:w-6 sm:h-6 text-blue-300 mr-2 sm:mr-3 flex-shrink-0 mt-0.5 sm:mt-0" />
+                      <div className="text-left">
+                        <p className="text-white font-display font-bold text-xs sm:text-base leading-tight sm:leading-normal">💻 PROJECT DEVELOPMENT – 2 MONTHS LIVE TRAINING</p>
+                        <p className="text-blue-200 text-[10px] sm:text-sm mt-0.5 sm:mt-1">Build Real-World Projects with MERN, Java, Python, React Native | Final Year Project Assistance</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between pl-6 sm:pl-9">
+                      <span className="text-white font-display font-bold text-base sm:text-xl">₹3,999</span>
+                      <Link to="/programs" className="px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-blue-700 font-semibold text-xs sm:text-sm rounded-lg hover:shadow-lg hover:bg-blue-50 transition-all whitespace-nowrap">
+                        LEARN MORE
+                      </Link>
+                    </div>
+                  </div>
+                </motion.div>
               </div>
               
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-display font-bold text-white leading-tight mb-4 sm:mb-6">
@@ -386,14 +446,13 @@ const HeroSection = () => {
 
               <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 mb-8 sm:mb-12 max-w-md sm:max-w-none mx-auto sm:mx-0">
                 <Link to="/enrollment" className="btn-accent text-base sm:text-lg px-6 sm:px-8 py-3 sm:py-4 text-center">
-                Enroll Now - ₹3,999
+                  Enroll Now - from ₹1,499
                   <FiArrowRight className="inline ml-2 w-4 h-4 sm:w-5 sm:h-5" />
                 </Link>
                 <Link to="/programs" className="px-6 sm:px-8 py-3 sm:py-4 border-2 border-white/30 text-white font-semibold rounded-xl hover:bg-white/10 hover:border-white/50 transition-all duration-300 text-center text-base sm:text-lg">
                   Explore Programs
                 </Link>
               </div>
-
             </motion.div>
           </div>
 
