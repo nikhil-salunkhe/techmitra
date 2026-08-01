@@ -26,8 +26,8 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Site URLs
-const FRONTEND_URL = process.env.FRONTEND_URL || 'https://techmitr.netlify.app';
-const API_URL = process.env.API_URL || 'https://techmitra-ggae.onrender.com';
+const FRONTEND_URL = 'https://techmitr.netlify.app';
+const API_URL = 'https://techmitra-ggae.onrender.com';
 
 // Path to subscriptions data file (keep JSON for subscriptions)
 const SUBSCRIPTION_FILE = path.join(__dirname, 'data', 'subscriptions.json');
@@ -96,7 +96,7 @@ async function sendEnrollmentEmail(student) {
     to: student.email,
     subject: `🎉 Enrollment Confirmed - ${student.plan} (${student.id})`,
     html: `<!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<html lang="en" xmlns="http://www.w3.org/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -289,7 +289,7 @@ async function sendEnrollmentNotificationToAdmin(student) {
     to: ADMIN_EMAIL,
     subject: `🆕 New Enrollment - ${student.fullName} (${student.id}) - ${student.plan}`,
     html: `<!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns="http://www.w3.org/xhtml">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -434,7 +434,7 @@ async function sendSubscriptionNotification(subscriber) {
     to: ADMIN_EMAIL,
     subject: '🎯 New Newsletter Subscription - TechMitra',
     html: `<!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns="http://www.w3.org/xhtml">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
