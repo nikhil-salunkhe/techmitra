@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import mongoose from 'mongoose';
 import nodemailer from 'nodemailer';
 import Enrollment from './models/Enrollment.js';
+import Counter from './models/Counter.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,6 +25,57 @@ mongoose.connect(MONGO_URI)
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
+
+// Helper: Get next sequence number (atomic operation)
+async function getNextSequence(name) {
+  const counter = await Counter.findOneAndUpdate(
+    { _id: name },
+    { $inc: { seq: 1 } },
+    { new: true, upsert: true }
+  );
+  return counter.seq;
+}
+
+// Initialize enrollment counter from existing data
+async function initializeEnrollmentCounter() {
+  try {
+    // Find the highest existing enrollment ID
+    const highestEnrollment = await Enrollment.findOne().sort({ id: -1 });
+    
+    if (highestEnrollment) {
+      // Extract numeric part from ID (e.g., "ENR-1003" -> 1003)
+      const highestId = highestEnrollment.id;
+      const match = highestId.match(/ENR-(\d+)/);
+      
+      if (match) {
+        const highestNumber = parseInt(match[1], 10);
+        
+        // Check if counter exists
+        const counter = await Counter.findById('enrollmentId');
+        
+        // Only initialize if counter doesn't exist
+        if (!counter) {
+          await Counter.create({
+            _id: 'enrollmentId',
+            seq: highestNumber,
+          });
+          console.log(`✅ Initialized enrollment counter to ${highestNumber} (from existing enrollment ${highestId})`);
+        } else {
+          console.log(`ℹ️  Enrollment counter already exists at ${counter.seq}`);
+        }
+      }
+    } else {
+      console.log('ℹ️  No existing enrollments found, counter will start from 1000');
+    }
+  } catch (error) {
+    console.error('⚠️  Error initializing enrollment counter:', error);
+  }
+}
+
+// Initialize counter after MongoDB connection
+mongoose.connection.once('open', () => {
+  initializeEnrollmentCounter();
+});
 
 // Site URLs
 const FRONTEND_URL = 'https://techmitr.netlify.app';
@@ -606,9 +658,9 @@ app.post('/api/enroll', async (req, res) => {
       selectedDuration = duration || '2 Months';
     }
 
-    // Count existing enrollments to generate ID
-    const count = await Enrollment.countDocuments();
-    const id = `ENR-${1000 + count + 1}`;
+    // Get next enrollment ID using atomic counter
+    const nextSeq = await getNextSequence('enrollmentId');
+    const id = `ENR-${1000 + nextSeq}`;
 
     const enrollment = new Enrollment({
       id,
