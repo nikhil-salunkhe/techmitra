@@ -88,7 +88,6 @@ const Enrollment = () => {
       technology: '',
       projectIdea: '',
       previousKnowledge: '',
-      preferredBatch: '',
       message: '',
       planId: 'project',
     },
@@ -175,7 +174,7 @@ const Enrollment = () => {
           <p className="text-dark-500 mb-6">
             Thank you for enrolling in the <strong>{submittedPlan} ({submittedFee} / {submittedDuration})</strong> at TechMitra! 
             {!emailWarning && <span>A confirmation email has been sent to <strong>{enrollmentData?.email}</strong>. </span>}
-            Our team will contact you within 24 hours to confirm your batch schedule.
+            Our team will contact you within 24 hours to provide further details and schedule information.
           </p>
           
           {emailWarning && (
@@ -518,22 +517,6 @@ const Enrollment = () => {
                       {formik.touched.technology && formik.errors.technology && (
                         <p className="text-red-500 text-xs mt-1">{formik.errors.technology}</p>
                       )}
-                    </div>
-
-                    {/* Batch */}
-                    <div>
-                      <label className="block text-sm font-medium text-dark-700 mb-2">Preferred Batch</label>
-                      <select
-                        name="preferredBatch"
-                        className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:border-primary-500 transition-colors"
-                        {...formik.getFieldProps('preferredBatch')}
-                      >
-                        <option value="">Select batch</option>
-                        <option value="Morning Batch (8-10 AM)">Morning Batch (8-10 AM)</option>
-                        <option value="Day Batch (11-1 PM)">Day Batch (11-1 PM)</option>
-                        <option value="Evening Batch (4-6 PM)">Evening Batch (4-6 PM)</option>
-                        <option value="Weekend Batch">Weekend Batch</option>
-                      </select>
                     </div>
 
                     {/* Project Idea */}

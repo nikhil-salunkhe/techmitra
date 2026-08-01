@@ -569,6 +569,24 @@ app.post('/api/enroll', async (req, res) => {
       return res.status(400).json({ success: false, message: 'All required fields must be filled' });
     }
 
+    // Check for duplicate email
+    const existingEmail = await Enrollment.findOne({ email: email.toLowerCase() });
+    if (existingEmail) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'This email address is already enrolled. Please use a different email or contact support if you need to update your enrollment.' 
+      });
+    }
+
+    // Check for duplicate phone
+    const existingPhone = await Enrollment.findOne({ phone });
+    if (existingPhone) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'This phone number is already enrolled. Please use a different phone number or contact support if you need to update your enrollment.' 
+      });
+    }
+
     // Determine plan details based on planId
     let selectedPlan = 'Training Plan';
     let selectedAmount = 3999;
