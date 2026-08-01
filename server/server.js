@@ -6,8 +6,12 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import mongoose from 'mongoose';
 import nodemailer from 'nodemailer';
+import dns from 'dns';
 import Enrollment from './models/Enrollment.js';
 import Counter from './models/Counter.js';
+
+// Fix DNS resolution for Gmail SMTP on Render (IPv4-first)
+dns.setDefaultResultOrder('ipv4first');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
