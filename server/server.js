@@ -5,14 +5,12 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import mongoose from 'mongoose';
-import nodemailer from 'nodemailer';
-import dns from 'dns';
+import { Resend } from 'resend';
 import Enrollment from './models/Enrollment.js';
 import Counter from './models/Counter.js';
 import Subscription from './models/Subscription.js';
 
-// Fix DNS resolution for Gmail SMTP on Render (IPv4-first)
-dns.setDefaultResultOrder('ipv4first');
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -86,25 +84,11 @@ mongoose.connection.once('open', () => {
 const FRONTEND_URL = 'https://techmitr.netlify.app';
 const API_URL = 'https://techmitra-ggae.onrender.com';
 
-// Email transporter configuration
-// IMPORTANT: Gmail SMTP requires the 'from' address to match the authenticated account
-const EMAIL_USER = 'nsalunkhe803@gmail.com';
-const EMAIL_PASS = 'lnigofxvhntzawtq';   // App password
+// Email configuration
+// IMPORTANT: Resend requires a verified domain for custom "from" addresses.
+// Until a domain is verified in Resend, use 'onboarding@resend.dev' as the sender.
+const RESEND_FROM = 'onboarding@resend.dev';
 const ADMIN_EMAIL = 'techmitrofficial@gmail.com';  // Correct admin contact email
-
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false,
-  family: 4,
-  connectionTimeout: 10000,
-  greetingTimeout: 10000,
-  socketTimeout: 15000,
-  auth: {
-    user: EMAIL_USER, 
-    pass: EMAIL_PASS,
-  },
-});
 
 // Format amount in Indian Rupees format
 function formatINR(amount) {
@@ -124,7 +108,7 @@ function detailRow(label, value, isLast = false) {
 // Send enrollment confirmation email to student
 async function sendEnrollmentEmail(student) {
   const mailOptions = {
-    from: `"TechMitra Training" <${EMAIL_USER}>`,
+    from: RESEND_FROM,
     to: student.email,
     subject: `🎉 Enrollment Confirmed - ${student.plan} (${student.id})`,
     html: `<!DOCTYPE html>
@@ -300,7 +284,12 @@ async function sendEnrollmentEmail(student) {
   };
 
   try {
-    await transporter.sendMail(mailOptions);
+    await resend.emails.send({
+      from: mailOptions.from,
+      to: mailOptions.to,
+      subject: mailOptions.subject,
+      html: mailOptions.html,
+    });
     console.log(`✅ Enrollment confirmation email sent to ${student.email}`);
     return { success: true };
   } catch (error) {
@@ -317,7 +306,7 @@ async function sendEnrollmentEmail(student) {
 async function sendEnrollmentNotificationToAdmin(student) {
   const adminUrl = `${FRONTEND_URL}/admin`;
   const mailOptions = {
-    from: `"TechMitra System" <${EMAIL_USER}>`,
+    from: RESEND_FROM,
     to: ADMIN_EMAIL,
     subject: `🆕 New Enrollment - ${student.fullName} (${student.id}) - ${student.plan}`,
     html: `<!DOCTYPE html>
@@ -448,7 +437,12 @@ async function sendEnrollmentNotificationToAdmin(student) {
   };
 
   try {
-    await transporter.sendMail(mailOptions);
+    await resend.emails.send({
+      from: mailOptions.from,
+      to: mailOptions.to,
+      subject: mailOptions.subject,
+      html: mailOptions.html,
+    });
     console.log(`✅ Admin notification sent for ${student.fullName} (${student.id})`);
     return true;
   } catch (error) {
@@ -462,7 +456,7 @@ async function sendEnrollmentNotificationToAdmin(student) {
 // Send subscription notification to admin
 async function sendSubscriptionNotification(subscriber) {
   const mailOptions = {
-    from: `"TechMitra Website" <${EMAIL_USER}>`,
+    from: RESEND_FROM,
     to: ADMIN_EMAIL,
     subject: '🎯 New Newsletter Subscription - TechMitra',
     html: `<!DOCTYPE html>
@@ -503,7 +497,7 @@ async function sendSubscriptionNotification(subscriber) {
                         </tr>
                         <tr>
                           <td style="padding:10px 12px; font-size:14px; font-weight:600; color:#6b7280; width:30%;">Total Subscribers</td>
-                          <td style="padding:10px 12px; font-size:14px; color:#1f2937;"><strong>${readSubscriptions().length}</strong></td>
+                          <td style="padding:10px 12px; font-size:14px; color:#1f2937;"><strong>${await Subscription.countDocuments()}</strong></td>
                         </tr>
                       </table></td></tr>
                     </table>
@@ -530,7 +524,12 @@ async function sendSubscriptionNotification(subscriber) {
   };
 
   try {
-    await transporter.sendMail(mailOptions);
+    await resend.emails.send({
+      from: mailOptions.from,
+      to: mailOptions.to,
+      subject: mailOptions.subject,
+      html: mailOptions.html,
+    });
     console.log(`✅ Subscription notification sent to admin for ${subscriber.email}`);
     return true;
   } catch (error) {
