@@ -9,6 +9,7 @@ import nodemailer from 'nodemailer';
 import dns from 'dns';
 import Enrollment from './models/Enrollment.js';
 import Counter from './models/Counter.js';
+import Subscription from './models/Subscription.js';
 
 // Fix DNS resolution for Gmail SMTP on Render (IPv4-first)
 dns.setDefaultResultOrder('ipv4first');
@@ -17,7 +18,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 // MongoDB Connection
 const MONGO_URI = 'mongodb+srv://nsalunkhe803_db_user:SEzMYjvKV5EKiTRj@cluster0.quefgcd.mongodb.net/techmitra?retryWrites=true&w=majority&appName=Cluster0';
@@ -84,35 +85,6 @@ mongoose.connection.once('open', () => {
 // Site URLs
 const FRONTEND_URL = 'https://techmitr.netlify.app';
 const API_URL = 'https://techmitra-ggae.onrender.com';
-
-// Path to subscriptions data file (keep JSON for subscriptions)
-const SUBSCRIPTION_FILE = path.join(__dirname, 'data', 'subscriptions.json');
-
-// Ensure data directory exists
-const dataDir = path.join(__dirname, 'data');
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
-}
-
-// Initialize subscription file if it doesn't exist
-if (!fs.existsSync(SUBSCRIPTION_FILE)) {
-  fs.writeFileSync(SUBSCRIPTION_FILE, JSON.stringify([], null, 2));
-}
-
-// Helper: Read subscriptions
-function readSubscriptions() {
-  try {
-    const data = fs.readFileSync(SUBSCRIPTION_FILE, 'utf-8');
-    return JSON.parse(data);
-  } catch (err) {
-    return [];
-  }
-}
-
-// Helper: Write subscriptions
-function writeSubscriptions(subscriptions) {
-  fs.writeFileSync(SUBSCRIPTION_FILE, JSON.stringify(subscriptions, null, 2));
-}
 
 // Email transporter configuration
 // IMPORTANT: Gmail SMTP requires the 'from' address to match the authenticated account
@@ -332,7 +304,7 @@ async function sendEnrollmentEmail(student) {
     return { 
       success: false, 
       error: error.message,
-      fullError: `Address not found\n\nYour message wasn't delivered to ${student.email} because the address couldn't be found or is unable to receive email.\n\nThe response from the remote server was:\n${error.message}`
+      fullError: `We were unable to send a confirmation email to ${student.email}.\n\nError details: ${error.message}`
     };
   }
 }
@@ -573,23 +545,22 @@ app.post('/api/subscribe', async (req, res) => {
     }
 
     // Check if already subscribed
-    const subscriptions = readSubscriptions();
-    const existing = subscriptions.find(s => s.email === email);
+    const existing = await Subscription.findOne({ email: email.toLowerCase() });
     if (existing) {
       return res.json({ success: true, message: 'You are already subscribed!' });
     }
 
-    const subscriber = {
-      id: `SUB-${Date.now()}`,
-      email,
-      subscribedAt: new Date().toISOString(),
-    };
+    // Create new subscription
+    const subscriber = new Subscription({
+      email: email.toLowerCase(),
+    });
 
-    subscriptions.push(subscriber);
-    writeSubscriptions(subscriptions);
+    await subscriber.save();
 
     // Send notification to admin (non-blocking)
-    sendSubscriptionNotification(subscriber);
+    sendSubscriptionNotification(subscriber).catch(error => {
+      console.log(`⚠️ Background subscription notification failed: ${error.message}`);
+    });
 
     res.status(201).json({
       success: true,
@@ -602,10 +573,9 @@ app.post('/api/subscribe', async (req, res) => {
 });
 
 // GET /api/subscriptions - Get all subscribers (for admin)
-app.get('/api/subscriptions', (req, res) => {
+app.get('/api/subscriptions', async (req, res) => {
   try {
-    const subscriptions = readSubscriptions();
-    subscriptions.sort((a, b) => new Date(b.subscribedAt) - new Date(a.subscribedAt));
+    const subscriptions = await Subscription.find().sort({ subscribedAt: -1 });
     res.json({ success: true, subscriptions });
   } catch (error) {
     console.error('Fetch subscriptions error:', error);
@@ -690,26 +660,20 @@ app.post('/api/enroll', async (req, res) => {
     // Save to MongoDB
     await enrollment.save();
 
-    // Send emails (non-blocking)
-    const emailResult = await sendEnrollmentEmail(enrollment);
-    await sendEnrollmentNotificationToAdmin(enrollment);
+    // Send emails in background (non-blocking)
+    sendEnrollmentEmail(enrollment).catch(error => {
+      console.log(`⚠️ Background email sending failed: ${error.message}`);
+    });
+    sendEnrollmentNotificationToAdmin(enrollment).catch(error => {
+      console.log(`⚠️ Background admin notification failed: ${error.message}`);
+    });
 
-    const response = {
+    // Send response immediately without waiting for emails
+    res.status(201).json({
       success: true,
       message: 'Enrollment successful! Check your email for confirmation.',
       enrollment,
-    };
-
-    // If email failed, include error details in response
-    if (!emailResult.success) {
-      response.emailWarning = {
-        message: '⚠️ Email Delivery Issue',
-        details: emailResult.fullError,
-        note: 'Your enrollment was successful, but we encountered an issue sending the confirmation email. Please verify your email address is correct. You can still access your enrollment details through our website.'
-      };
-    }
-
-    res.status(201).json(response);
+    });
   } catch (error) {
     console.error('Enrollment error:', error);
     res.status(500).json({ success: false, message: 'Server error. Please try again.' });
