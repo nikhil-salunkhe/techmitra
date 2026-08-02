@@ -118,7 +118,7 @@ function writeSubscriptions(subscriptions) {
 // IMPORTANT: Gmail SMTP requires the 'from' address to match the authenticated account
 const EMAIL_USER = 'nsalunkhe803@gmail.com';
 const EMAIL_PASS = 'lnigofxvhntzawtq';   // App password
-const ADMIN_EMAIL = 'techmitraofficial@gmail.com';  // Correct admin contact email
+const ADMIN_EMAIL = 'techmitrofficial@gmail.com';  // Correct admin contact email
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
