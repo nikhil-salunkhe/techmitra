@@ -19,15 +19,30 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// MongoDB Connection
-const MONGO_URI = 'mongodb+srv://nsalunkhe803_db_user:SEzMYjvKV5EKiTRj@cluster0.quefgcd.mongodb.net/techmitra?retryWrites=true&w=majority&appName=Cluster0';
+// MongoDB Connection (uses MONGO_URI environment variable in production, falls back for local development)
+const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://nsalunkhe803_db_user:SEzMYjvKV5EKiTRj@cluster0.quefgcd.mongodb.net/techmitra?retryWrites=true&w=majority&appName=Cluster0';
 
 mongoose.connect(MONGO_URI)
   .then(() => console.log('✅ Connected to MongoDB Atlas'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
-// Middleware
-app.use(cors());
+// Middleware - CORS whitelist (production domains + local development)
+const allowedOrigins = [
+  'https://techmitraofficial.netlify.app',  // current production frontend
+  'https://techmitr.in',
+  'https://www.techmitr.in',
+  'https://techmitr.netlify.app',      // kept for testing during domain migration
+  'https://techmitra-ggae.onrender.com',
+  'http://localhost:5173',             // Vite dev server
+  'http://localhost:3000',
+];
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no Origin header (health checks, curl, server-to-server)
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(null, false); // reject silently (browser blocks response, no crash)
+  },
+}));
 app.use(bodyParser.json());
 
 // Helper: Get next sequence number (atomic operation)
@@ -76,21 +91,57 @@ async function initializeEnrollmentCounter() {
   }
 }
 
+// Initialize business enquiry counter from existing data (same pattern as enrollment counter)
+async function initializeBusinessCounter() {
+  try {
+    // Find the highest existing business enquiry ID
+    const highestEnquiry = await BusinessEnquiry.findOne().sort({ id: -1 });
+
+    if (highestEnquiry) {
+      // Extract numeric part from ID (e.g., "BUS-1003" -> 1003)
+      const highestId = highestEnquiry.id;
+      const match = highestId.match(/BUS-(\d+)/);
+
+      if (match) {
+        const highestNumber = parseInt(match[1], 10);
+
+        // Check if counter exists
+        const counter = await Counter.findById('businessEnquiryId');
+
+        // Only initialize if counter doesn't exist
+        if (!counter) {
+          await Counter.create({
+            _id: 'businessEnquiryId',
+            seq: highestNumber,
+          });
+          console.log(`✅ Initialized business enquiry counter to ${highestNumber} (from existing enquiry ${highestId})`);
+        } else {
+          console.log(`ℹ️  Business enquiry counter already exists at ${counter.seq}`);
+        }
+      }
+    } else {
+      console.log('ℹ️  No existing business enquiries found, counter will start from 1000');
+    }
+  } catch (error) {
+    console.error('⚠️  Error initializing business enquiry counter:', error);
+  }
+}
+
 // Initialize counters after MongoDB connection
 mongoose.connection.once('open', () => {
   initializeEnrollmentCounter();
   initializeBusinessCounter();
 });
 
-// Site URLs
-const FRONTEND_URL = 'https://techmitr.netlify.app';
+// Site URLs (environment variables in production, sensible defaults otherwise)
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://techmitr.in';
 const API_URL = 'https://techmitra-ggae.onrender.com';
 
 // Email configuration
 // IMPORTANT: Resend requires a verified domain for custom "from" addresses.
 // Until a domain is verified in Resend, use 'onboarding@resend.dev' as the sender.
 const RESEND_FROM = 'onboarding@resend.dev';
-const ADMIN_EMAIL = 'techmitrofficial@gmail.com';  // Correct admin contact email
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'techmitrofficial@gmail.com';  // Correct admin contact email
 
 // Format amount in Indian Rupees format
 function formatINR(amount) {
@@ -538,6 +589,8 @@ async function sendSubscriptionNotification(subscriber) {
     console.log(`⚠️ Email notification failed: ${error.message}`);
     return false;
   }
+}
+
 // ============ BUSINESS ENQUIRY ============
 
 // Send business enquiry confirmation email to the client
@@ -605,9 +658,6 @@ async function sendBusinessEnquiryEmail(enquiry) {
     console.log(`⚠️ Business enquiry email failed: ${error.message}`);
     return false;
   }
-}
-
-// POST /api/subscribe - New newsletter subscription
 }
 
 // Send business enquiry notification to admin
