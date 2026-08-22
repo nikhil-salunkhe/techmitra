@@ -133,10 +133,16 @@ const Navbar = () => {
               </div>
             ))}
 
-            {/* CTA Button */}
+            {/* CTA Buttons */}
+            <Link
+              to="/business-enquiry"
+              className="ml-4 px-4 lg:px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:shadow-emerald-500/30 hover:-translate-y-0.5 transition-all duration-300"
+            >
+              For Business
+            </Link>
             <Link
               to="/enrollment"
-              className="ml-4 px-5 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:shadow-primary-500/30 hover:-translate-y-0.5 transition-all duration-300"
+              className="px-4 lg:px-5 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:shadow-primary-500/30 hover:-translate-y-0.5 transition-all duration-300"
             >
               Enroll Now
             </Link>
@@ -204,10 +210,16 @@ const Navbar = () => {
                   )}
                 </div>
               ))}
-              <div className="pt-2">
+              <div className="pt-2 grid grid-cols-2 gap-3">
+                <Link
+                  to="/business-enquiry"
+                  className="block w-full text-center px-4 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold rounded-xl text-sm"
+                >
+                  For Business
+                </Link>
                 <Link
                   to="/enrollment"
-                  className="block w-full text-center px-4 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-xl"
+                  className="block w-full text-center px-4 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-xl text-sm"
                 >
                   Enroll Now
                 </Link>

@@ -10,6 +10,8 @@ import About from './pages/About';
 import Programs from './pages/Programs';
 import Enrollment from './pages/Enrollment';
 import Contact from './pages/Contact';
+import Services from './pages/Services';
+import BusinessEnquiry from './pages/BusinessEnquiry';
 import Admin from './pages/Admin';
 import AdminLogin from './pages/AdminLogin';
 
@@ -52,6 +54,8 @@ function App() {
           <Route path="/programs/:tech" element={<Programs />} />
           <Route path="/enrollment" element={<Enrollment />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/business-enquiry" element={<BusinessEnquiry />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route
             path="/admin"

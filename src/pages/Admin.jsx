@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FiUsers, FiSearch, FiTrash2, FiRefreshCw, FiCheckCircle, FiXCircle, FiClock, FiMail, FiPhone, FiMapPin, FiBook, FiCalendar, FiDollarSign, FiChevronDown, FiChevronUp, FiDownload } from 'react-icons/fi';
+import { FiUsers, FiSearch, FiTrash2, FiRefreshCw, FiCheckCircle, FiXCircle, FiClock, FiMail, FiPhone, FiMapPin, FiBook, FiCalendar, FiDollarSign, FiChevronDown, FiChevronUp, FiDownload, FiBriefcase } from 'react-icons/fi';
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
 const Admin = () => {
+  const [activeTab, setActiveTab] = useState('enrollments');
   const [enrollments, setEnrollments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -12,8 +13,17 @@ const Admin = () => {
   const [filterStatus, setFilterStatus] = useState('all');
   const [stats, setStats] = useState({ total: 0, active: 0, completed: 0, totalRevenue: 0 });
 
+  // Business Enquiries state
+  const [businessEnquiries, setBusinessEnquiries] = useState([]);
+  const [businessLoading, setBusinessLoading] = useState(true);
+  const [businessSearch, setBusinessSearch] = useState('');
+  const [businessFilter, setBusinessFilter] = useState('all');
+  const [expandedBusinessId, setExpandedBusinessId] = useState(null);
+  const [businessStatsData, setBusinessStatsData] = useState({ total: 0, newCount: 0, inProgress: 0, completed: 0 });
+
   useEffect(() => {
     fetchEnrollments();
+    fetchBusinessEnquiries();
   }, []);
 
   const fetchEnrollments = async () => {
@@ -29,6 +39,30 @@ const Admin = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchBusinessEnquiries = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/business-enquiries`);
+      const data = await response.json();
+      if (data.success) {
+        setBusinessEnquiries(data.enquiries);
+        calculateBusinessStats(data.enquiries);
+      }
+    } catch (error) {
+      console.error('Failed to fetch business enquiries:', error);
+    } finally {
+      setBusinessLoading(false);
+    }
+  };
+
+  const calculateBusinessStats = (data) => {
+    setBusinessStatsData({
+      total: data.length,
+      newCount: data.filter(e => e.status === 'new').length,
+      inProgress: data.filter(e => e.status === 'in-progress').length,
+      completed: data.filter(e => e.status === 'completed').length,
+    });
   };
 
   const calculateStats = (data) => {
@@ -81,6 +115,88 @@ const Admin = () => {
     
     return matchesSearch && matchesStatus;
   });
+
+  // ===== BUSINESS ENQUIRY HANDLERS =====
+  const handleBusinessDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this business enquiry?')) return;
+    try {
+      const response = await fetch(`${API_URL}/api/business-enquiries/${id}`, { method: 'DELETE' });
+      const data = await response.json();
+      if (data.success) {
+        fetchBusinessEnquiries();
+      }
+    } catch (error) {
+      console.error('Business enquiry delete failed:', error);
+    }
+  };
+
+  const handleBusinessStatusChange = async (id, newStatus) => {
+    try {
+      const response = await fetch(`${API_URL}/api/business-enquiries/${id}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        fetchBusinessEnquiries();
+      }
+    } catch (error) {
+      console.error('Business status update failed:', error);
+    }
+  };
+
+  const filteredBusinessEnquiries = businessEnquiries.filter(e => {
+    const matchesSearch =
+      e.businessName?.toLowerCase().includes(businessSearch.toLowerCase()) ||
+      e.contactPerson?.toLowerCase().includes(businessSearch.toLowerCase()) ||
+      e.email?.toLowerCase().includes(businessSearch.toLowerCase()) ||
+      e.id?.toLowerCase().includes(businessSearch.toLowerCase()) ||
+      e.phone?.includes(businessSearch) ||
+      e.businessType?.toLowerCase().includes(businessSearch.toLowerCase()) ||
+      e.serviceType?.toLowerCase().includes(businessSearch.toLowerCase());
+
+    const matchesStatus = businessFilter === 'all' || e.status === businessFilter;
+
+    return matchesSearch && matchesStatus;
+  });
+
+  const getBusinessStatusBadge = (status) => {
+    switch (status) {
+      case 'new':
+        return <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full font-medium flex items-center"><FiClock className="w-3 h-3 mr-1" />New</span>;
+      case 'contacted':
+        return <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full font-medium flex items-center"><FiPhone className="w-3 h-3 mr-1" />Contacted</span>;
+      case 'in-progress':
+        return <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium flex items-center"><FiRefreshCw className="w-3 h-3 mr-1" />In Progress</span>;
+      case 'completed':
+        return <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium flex items-center"><FiCheckCircle className="w-3 h-3 mr-1" />Completed</span>;
+      case 'rejected':
+        return <span className="px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full font-medium flex items-center"><FiXCircle className="w-3 h-3 mr-1" />Rejected</span>;
+      default:
+        return <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full font-medium">{status}</span>;
+    }
+  };
+
+  const exportBusinessToCSV = () => {
+    const headers = ['ID', 'Business Name', 'Contact Person', 'Email', 'Phone', 'City', 'Business Type', 'Service Type', 'Budget', 'Timeline', 'Description', 'Status', 'Date'];
+    const rows = businessEnquiries.map(e => [
+      e.id, e.businessName, e.contactPerson, e.email, e.phone, e.city || '',
+      e.businessType, e.serviceType, e.budget || '', e.timeline || '',
+      `"${(e.description || '').replace(/"/g, '""')}"`, e.status,
+      new Date(e.createdAt).toLocaleDateString(),
+    ]);
+
+    const csvContent = [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `business-enquiries-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -135,15 +251,54 @@ const Admin = () => {
                 <FiUsers className="mr-3 w-8 h-8" />
                 Admin Dashboard
               </h1>
-              <p className="text-blue-200/80 mt-1">Manage student enrollments</p>
+              <p className="text-blue-200/80 mt-1">Manage student enrollments &amp; business enquiries</p>
             </div>
-            <button onClick={fetchEnrollments} className="p-2 bg-white/10 rounded-lg text-white hover:bg-white/20 transition-colors">
+            <button
+              onClick={() => (activeTab === 'enrollments' ? fetchEnrollments() : fetchBusinessEnquiries())}
+              className="p-2 bg-white/10 rounded-lg text-white hover:bg-white/20 transition-colors"
+            >
               <FiRefreshCw className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Tabs */}
+          <div className="mt-6 flex gap-2 sm:gap-3">
+            <button
+              onClick={() => setActiveTab('enrollments')}
+              className={`flex items-center px-4 sm:px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${
+                activeTab === 'enrollments'
+                  ? 'bg-white text-primary-700 shadow-lg'
+                  : 'bg-white/10 text-white hover:bg-white/20'
+              }`}
+            >
+              <FiUsers className="mr-2 w-4 h-4" /> Student Enrollments
+              {stats.total > 0 && (
+                <span className={`ml-2 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${activeTab === 'enrollments' ? 'bg-primary-100 text-primary-700' : 'bg-white/20'}`}>
+                  {stats.total}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={() => setActiveTab('business')}
+              className={`flex items-center px-4 sm:px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${
+                activeTab === 'business'
+                  ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg'
+                  : 'bg-white/10 text-white hover:bg-white/20'
+              }`}
+            >
+              <FiBriefcase className="mr-2 w-4 h-4" /> Business Enquiries
+              {businessStatsData.total > 0 && (
+                <span className={`ml-2 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${activeTab === 'business' ? 'bg-white/25' : 'bg-white/20'}`}>
+                  {businessStatsData.total}
+                </span>
+              )}
             </button>
           </div>
         </div>
       </section>
 
+      {activeTab === 'enrollments' && (
+      <>
       {/* Stats */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 mb-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -324,6 +479,194 @@ const Admin = () => {
           </div>
         )}
       </section>
+      </>
+      )}
+
+      {/* ==================== BUSINESS ENQUIRIES TAB ==================== */}
+      {activeTab === 'business' && (
+        <>
+          {/* Stats */}
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 mb-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { label: 'Total Enquiries', value: businessStatsData.total, icon: FiBriefcase, color: 'from-emerald-500 to-teal-600' },
+                { label: 'New (Not Contacted)', value: businessStatsData.newCount, icon: FiClock, color: 'from-yellow-500 to-orange-500' },
+                { label: 'In Progress', value: businessStatsData.inProgress, icon: FiRefreshCw, color: 'from-purple-500 to-purple-600' },
+                { label: 'Completed Projects', value: businessStatsData.completed, icon: FiCheckCircle, color: 'from-green-500 to-green-600' },
+              ].map((stat, idx) => (
+                <motion.div
+                  key={stat.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.1 }}
+                  className="bg-white rounded-xl p-4 shadow-sm border border-gray-100"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs text-dark-400 font-medium">{stat.label}</span>
+                    <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${stat.color} flex items-center justify-center`}>
+                      <stat.icon className="w-4 h-4 text-white" />
+                    </div>
+                  </div>
+                  <p className="text-2xl font-bold text-dark-900">{stat.value}</p>
+                </motion.div>
+              ))}
+            </div>
+          </section>
+
+          {/* Filters and Search */}
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
+            <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+              <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+                <div className="relative flex-1 w-full">
+                  <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-dark-400 w-5 h-5" />
+                  <input
+                    type="text"
+                    placeholder="Search by business name, contact person, email, ID, phone..."
+                    value={businessSearch}
+                    onChange={(e) => setBusinessSearch(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 focus:border-emerald-500 focus:outline-none bg-gray-50 text-sm"
+                  />
+                </div>
+                <div className="flex gap-3 w-full md:w-auto">
+                  <select
+                    value={businessFilter}
+                    onChange={(e) => setBusinessFilter(e.target.value)}
+                    className="px-4 py-2.5 rounded-lg border border-gray-200 focus:border-emerald-500 focus:outline-none bg-gray-50 text-sm"
+                  >
+                    <option value="all">All Status</option>
+                    <option value="new">New</option>
+                    <option value="contacted">Contacted</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                    <option value="rejected">Rejected</option>
+                  </select>
+                  <button onClick={exportBusinessToCSV} className="px-4 py-2.5 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors flex items-center">
+                    <FiDownload className="w-4 h-4 mr-2" /> Export CSV
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Business Enquiries List */}
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+            {businessLoading ? (
+              <div className="bg-white rounded-xl p-12 text-center shadow-sm border border-gray-100">
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-600 mx-auto mb-4"></div>
+                <p className="text-dark-500 text-sm">Loading business enquiries...</p>
+              </div>
+            ) : filteredBusinessEnquiries.length === 0 ? (
+              <div className="bg-white rounded-xl p-12 text-center shadow-sm border border-gray-100">
+                <FiBriefcase className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-dark-900 mb-2">No Business Enquiries Found</h3>
+                <p className="text-dark-500">No businesses have enquired yet or no results match your search.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {filteredBusinessEnquiries.map((enquiry, idx) => (
+                  <motion.div
+                    key={enquiry.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.03 }}
+                    className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
+                  >
+                    {/* Card Header */}
+                    <button
+                      onClick={() => setExpandedBusinessId(expandedBusinessId === enquiry.id ? null : enquiry.id)}
+                      className="w-full p-4 md:p-6 text-left"
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex items-start gap-4 min-w-0">
+                          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                            {enquiry.businessName?.charAt(0)?.toUpperCase()}
+                          </div>
+                          <div className="min-w-0">
+                            <div className="flex items-center flex-wrap gap-2">
+                              <h3 className="text-base sm:text-lg font-semibold text-dark-900 truncate">{enquiry.businessName}</h3>
+                              {getBusinessStatusBadge(enquiry.status)}
+                              {enquiry.status === 'new' && (
+                                <span className="px-2 py-0.5 bg-red-100 text-red-600 text-[10px] font-bold rounded-full animate-pulse">ACTION NEEDED</span>
+                              )}
+                            </div>
+                            <p className="text-dark-500 text-sm mt-0.5 truncate">
+                              {enquiry.contactPerson} • {enquiry.serviceType}
+                            </p>
+                            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                              <span className="text-[11px] px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full">{enquiry.id}</span>
+                              <span className="text-[11px] px-2 py-0.5 bg-purple-50 text-purple-700 rounded-full">{enquiry.businessType}</span>
+                              <span className="text-[11px] text-dark-400">
+                                {new Date(enquiry.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex-shrink-0 text-right hidden md:block">
+                          <p className="text-xs text-dark-400 mb-1">{expandedBusinessId === enquiry.id ? 'Hide Details' : 'View Details'}</p>
+                          {expandedBusinessId === enquiry.id ? <FiChevronUp className="w-5 h-5 text-dark-400" /> : <FiChevronDown className="w-5 h-5 text-dark-400" />}
+                        </div>
+                      </div>
+                    </button>
+
+                    {/* Expanded Details */}
+                    {expandedBusinessId === enquiry.id && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        className="border-t border-gray-100 bg-gray-50/60 p-4 md:p-6"
+                      >
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="space-y-2">
+                            <h4 className="text-xs font-semibold text-dark-400 uppercase tracking-wider">Contact Information</h4>
+                            <div className="space-y-1.5">
+                              <p className="text-sm text-dark-600 flex items-center"><FiMail className="w-4 h-4 mr-2 text-emerald-600 flex-shrink-0" />{enquiry.email}</p>
+                              <a href={`tel:${enquiry.phone}`} className="text-sm text-dark-600 hover:text-emerald-600 flex items-center"><FiPhone className="w-4 h-4 mr-2 text-emerald-600 flex-shrink-0" />{enquiry.phone}</a>
+                              {enquiry.city && <p className="text-sm text-dark-600 flex items-center"><FiMapPin className="w-4 h-4 mr-2 text-emerald-600 flex-shrink-0" />{enquiry.city}</p>}
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <h4 className="text-xs font-semibold text-dark-400 uppercase tracking-wider">Project Details</h4>
+                            <div className="space-y-1.5">
+                              <p className="text-sm text-dark-600"><span className="font-medium">Service:</span> {enquiry.serviceType}</p>
+                              <p className="text-sm text-dark-600"><span className="font-medium">Budget:</span> {enquiry.budget || 'To be discussed'}</p>
+                              <p className="text-sm text-dark-600"><span className="font-medium">Timeline:</span> {enquiry.timeline || 'Flexible'}</p>
+                            </div>
+                          </div>
+                        </div>
+                        {enquiry.description && (
+                          <div className="mt-4 pt-4 border-t border-gray-200">
+                            <h4 className="text-xs font-semibold text-dark-400 uppercase tracking-wider mb-2">Requirement Description</h4>
+                            <p className="text-sm text-dark-600 bg-white rounded-lg p-3 border border-gray-100 whitespace-pre-line">{enquiry.description}</p>
+                          </div>
+                        )}
+
+                        {/* Actions */}
+                        <div className="mt-4 pt-4 border-t border-gray-200 flex flex-wrap gap-2 items-center">
+                          <button onClick={() => handleBusinessStatusChange(enquiry.id, 'contacted')} className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-xs font-medium hover:bg-blue-100 transition-colors flex items-center">
+                            <FiPhone className="w-3 h-3 mr-1" /> Mark Contacted
+                          </button>
+                          <button onClick={() => handleBusinessStatusChange(enquiry.id, 'in-progress')} className="px-3 py-1.5 bg-purple-50 text-purple-700 rounded-lg text-xs font-medium hover:bg-purple-100 transition-colors flex items-center">
+                            <FiRefreshCw className="w-3 h-3 mr-1" /> In Progress
+                          </button>
+                          <button onClick={() => handleBusinessStatusChange(enquiry.id, 'completed')} className="px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-xs font-medium hover:bg-green-100 transition-colors flex items-center">
+                            <FiCheckCircle className="w-3 h-3 mr-1" /> Mark Completed
+                          </button>
+                          <button onClick={() => handleBusinessStatusChange(enquiry.id, 'rejected')} className="px-3 py-1.5 bg-red-50 text-red-700 rounded-lg text-xs font-medium hover:bg-red-100 transition-colors flex items-center">
+                            <FiXCircle className="w-3 h-3 mr-1" /> Reject
+                          </button>
+                          <button onClick={() => handleBusinessDelete(enquiry.id)} className="px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg text-xs font-medium hover:bg-red-100 hover:text-red-600 transition-colors flex items-center ml-auto">
+                            <FiTrash2 className="w-3 h-3 mr-1" /> Delete
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </section>
+        </>
+      )}
     </div>
   );
 };

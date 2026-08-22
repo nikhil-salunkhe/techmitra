@@ -43,6 +43,14 @@ const Footer = () => {
     { name: 'Contact', path: '/contact' },
   ];
 
+  const businessLinks = [
+    { name: 'Business Services', path: '/services' },
+    { name: 'Website Development', path: '/services' },
+    { name: 'Billing Software', path: '/services' },
+    { name: 'Management Systems', path: '/services' },
+    { name: 'Business Enquiry', path: '/business-enquiry' },
+  ];
+
   const programs = [
     { name: 'AI Through Development', path: '/programs/ai' },
     { name: 'MERN Web Project Development', path: '/programs/mern' },
@@ -68,7 +76,7 @@ const Footer = () => {
       </button>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 sm:pt-16 pb-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 sm:gap-10">
           {/* Brand */}
           <div>
             <Link to="/" className="flex items-center space-x-2 mb-4">
@@ -83,8 +91,9 @@ const Footer = () => {
               </div>
             </Link>
             <p className="text-dark-300 text-sm leading-relaxed mb-6">
-              We help college students build industry-oriented final year projects. 
-              Learn from experts and become job-ready with real project experience.
+              We help college students build industry-oriented final year projects and
+              provide websites, apps &amp; billing software for businesses.
+              Learn from experts and grow with real digital solutions.
             </p>
             <div className="flex flex-wrap gap-2 sm:gap-3">
               <a href="https://wa.me/919764149564" target="_blank" rel="noopener noreferrer" 
@@ -140,6 +149,26 @@ const Footer = () => {
                   >
                     <span className="w-1 h-1 bg-accent-500 rounded-full mr-2" />
                     {program.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* For Business */}
+          <div>
+            <h3 className="text-white font-display font-semibold text-lg mb-4">
+              For Business <span className="ml-1 text-[10px] font-bold bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-2 py-0.5 rounded-full align-middle">NEW</span>
+            </h3>
+            <ul className="space-y-3">
+              {businessLinks.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    to={link.path}
+                    className="text-dark-300 hover:text-emerald-400 text-sm transition-colors duration-200 flex items-center"
+                  >
+                    <span className="w-1 h-1 bg-emerald-500 rounded-full mr-2" />
+                    {link.name}
                   </Link>
                 </li>
               ))}

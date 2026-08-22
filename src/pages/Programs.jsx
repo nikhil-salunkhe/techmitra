@@ -16,7 +16,7 @@ const programsData = [
     durationWeeks: 4,
     fee: '₹1,499',
     premiumFee: '₹1,499',
-    enrolled: '50+',
+    enrolled: 'Limited',
     overview: '🚀 Learn AI-Powered Development and build real-world projects using VS Code, GitHub Copilot, and Cline AI. This 1-month intensive live project training program is designed to make you a smarter, faster developer by automating coding, debugging, refactoring, and deployment with AI.',
     curriculum: [
       { week: 'Week 1', title: 'AI-Assisted Coding & VS Code Setup', topics: ['VS Code Setup & Productivity', 'GitHub Copilot Basics', 'AI-Powered Code Suggestions', 'Claude AI / Cline AI Intro', 'Smart Shortcuts & Extensions', 'Workflow Optimization'] },
@@ -44,7 +44,7 @@ const programsData = [
     durationWeeks: 8,
     fee: '₹3,999',
     premiumFee: '₹3,999',
-    enrolled: '200+',
+    enrolled: 'Limited',
     overview: 'Learn modern web development technologies and build a practical, real-world web project using the MERN technology ecosystem. This 2-month training focuses on hands-on development, API integration, database connectivity, GitHub, and project completion.',
     curriculum: [
       { week: 'Week 1-2', title: 'JavaScript & HTML/CSS Fundamentals', topics: ['ES6+ Features', 'Async/Await', 'Promises', 'DOM Manipulation', 'HTML5', 'CSS3'] },
@@ -72,7 +72,7 @@ const programsData = [
     durationWeeks: 8,
     fee: '₹3,999',
     premiumFee: '₹3,999',
-    enrolled: '150+',
+    enrolled: 'Limited',
     overview: 'Build a practical Java-based application while learning important Core Java concepts, database connectivity, MySQL, JDBC, and basic backend development concepts. The training is focused on project development and practical implementation.',
     curriculum: [
       { week: 'Week 1-2', title: 'Core Java & OOP', topics: ['Java Fundamentals', 'OOP Concepts', 'Collections Framework', 'Exception Handling', 'Streams & Lambda', 'File I/O'] },
@@ -100,7 +100,7 @@ const programsData = [
     durationWeeks: 8,
     fee: '₹3,999',
     premiumFee: '₹3,999',
-    enrolled: '180+',
+    enrolled: 'Limited',
     overview: 'Learn Python programming through practical project development. Students will work with Python, databases, backend framework basics, APIs, and GitHub while developing a real-world application.',
     curriculum: [
       { week: 'Week 1-2', title: 'Python Programming & OOP', topics: ['Python Basics', 'OOP in Python', 'Exception Handling', 'Functions & Modules', 'File Handling', 'Data Structures'] },
@@ -128,7 +128,7 @@ const programsData = [
     durationWeeks: 8,
     fee: '₹3,999',
     premiumFee: '₹3,999',
-    enrolled: '120+',
+    enrolled: 'Limited',
     overview: 'Learn mobile application development using React Native and build a practical Android application. The training focuses on UI development, navigation, API integration, backend connectivity, and completing a working mobile application.',
     curriculum: [
       { week: 'Week 1-2', title: 'JavaScript & React Native Fundamentals', topics: ['JavaScript Basics', 'JSX & Components', 'State & Props', 'Navigation', 'Styling', 'Expo Setup'] },
@@ -232,7 +232,7 @@ const ProgramDetail = ({ program }) => {
                 <div className="card p-4 text-center">
                   <FiUsers className="w-5 h-5 text-primary-500 mx-auto mb-2" />
                   <p className="text-lg font-display font-bold text-dark-900">{program.enrolled}</p>
-                  <p className="text-xs text-dark-400">Students Enrolled</p>
+                  <p className="text-xs text-dark-400">Seats Per Batch</p>
                 </div>
               </div>
 

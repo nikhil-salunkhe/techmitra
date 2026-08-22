@@ -1,17 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiCheck, FiAward, FiTarget, FiEye, FiHeart, FiCode, FiUsers, FiBook, FiStar, FiArrowRight } from 'react-icons/fi';
+import { FiCheck, FiAward, FiTarget, FiEye, FiHeart, FiCode, FiUsers, FiBook, FiStar, FiArrowRight, FiBriefcase, FiGlobe, FiPrinter, FiLayers } from 'react-icons/fi';
 import { FaReact, FaJava, FaPython, FaNodeJs, FaGithub } from 'react-icons/fa';
 
 const About = () => {
   const milestones = [
-    { year: '2024', title: 'TechMitra Founded', description: 'Started with a vision to transform final year project development' },
-    { year: '2024 Q1', title: 'First Batch Launched', description: 'Launched MERN Stack program with 50 students' },
-    { year: '2024 Q2', title: 'Expanded Programs', description: 'Added Java and Python application development programs' },
-    { year: '2024 Q3', title: '100+ Projects', description: 'Celebrated 100+ successfully completed student projects' },
-    { year: '2024 Q4', title: 'React Native Added', description: 'Launched mobile app development program' },
-    { year: '2025', title: '500+ Students', description: '500+ students trained across all programs' },
+    { year: 'Jan 2026', title: 'TechMitra Founded', description: 'Launched as a fresh startup with a vision to transform final year project training in India' },
+    { year: 'Jan 2026', title: 'Training Programs Live', description: 'AI Through Development, MERN, Java, Python and React Native live project training opened for admissions' },
+    { year: 'Jan 2026', title: 'Business Services Launched', description: 'Started building websites, GST billing software & management systems for shops, schools, classes, hotels, banks and malls' },
+    { year: 'Today', title: 'Admissions & Projects Open', description: 'First batches filling fast - limited seats for quality mentorship' },
+    { year: 'Next', title: 'Your Success Story', description: 'Join us at the beginning and grow with us - early students get extra personal attention!' },
   ];
 
   const values = [
@@ -38,8 +37,8 @@ const About = () => {
               About <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-accent-300">TechMitra</span>
             </h1>
             <p className="text-xl text-blue-200/80 leading-relaxed">
-              We are on a mission to transform how college students approach final year projects. 
-              We believe in teaching real skills, not just theory.
+              We are on a mission to transform how college students approach final year projects.
+              And we don't just teach — we also build websites, apps &amp; billing software for local businesses.
             </p>
           </div>
         </div>
@@ -55,28 +54,34 @@ const About = () => {
               </h2>
               <div className="space-y-4 text-dark-500 leading-relaxed">
                 <p>
-                  TechMitra was born from a simple observation: college students struggle with final year projects 
+                  TechMitra was born from a simple observation: college students struggle with final year projects
                   not because they lack intelligence, but because they lack practical, industry-oriented training.
                 </p>
                 <p>
-                  We saw that students were either given ready-made projects or left to figure things out on their own. 
+                  We saw that students were either given ready-made projects or left to figure things out on their own.
                   Neither approach prepared them for real-world software development.
                 </p>
                 <p>
-                  So we created TechMitra - a platform where students learn how software companies actually build projects. 
-                  From requirement analysis to deployment, we teach the complete development lifecycle.
+                  So in January 2026, we launched TechMitra - a platform where students learn how software companies
+                  actually build projects. From requirement analysis to deployment, we teach the complete development lifecycle.
                 </p>
                 <p>
-                  Today, we've helped 500+ students build production-ready projects and kickstart their careers in technology.
+                  And we didn't stop at teaching. From day one, we also build modern websites, GST billing software
+                  and management systems for shops, schools, classes, hotels, banks and malls - bringing the same
+                  quality we teach our students to real businesses.
+                </p>
+                <p>
+                  We are a young, energetic startup - and that's exactly why every student and every client gets
+                  our complete attention. Join us at the beginning and grow with us!
                 </p>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4" data-aos="fade-left">
               {[
-                { icon: FiAward, value: '500+', label: 'Students Trained' },
-                { icon: FiCode, value: '100+', label: 'Projects Built' },
-                { icon: FiUsers, value: '4', label: 'Tech Programs' },
-                { icon: FiStar, value: '100%', label: 'Online' },
+                { icon: FiBook, value: '5', label: 'Tech Programs' },
+                { icon: FiBriefcase, value: '3', label: 'Business Services' },
+                { icon: FiUsers, value: '1:1', label: 'Mentorship' },
+                { icon: FiStar, value: '2026', label: 'Fresh Startup' },
               ].map((item) => (
                 <div key={item.label} className="card text-center p-6">
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center mx-auto mb-3">
@@ -160,6 +165,90 @@ const About = () => {
         </div>
       </section>
 
+      {/* Business Services */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12 sm:mb-16" data-aos="fade-up">
+            <div className="inline-flex items-center px-4 py-2 bg-emerald-50 border border-emerald-200 rounded-full mb-4">
+              <FiBriefcase className="w-4 h-4 text-emerald-600 mr-2" />
+              <span className="text-emerald-700 text-xs sm:text-sm font-semibold">For Businesses</span>
+            </div>
+            <h2 className="section-title">Beyond Training — We Build for Businesses</h2>
+            <p className="section-subtitle mx-auto">
+              The same expertise we teach our students is what we use to build digital solutions for local businesses
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mb-10 sm:mb-12">
+            {[
+              {
+                icon: FiGlobe,
+                color: 'from-emerald-500 to-teal-600',
+                title: 'Business Websites',
+                description: 'Modern, fast and mobile-responsive websites with enquiry forms, WhatsApp chat and Google Maps integration that bring customers to your business.',
+              },
+              {
+                icon: FiPrinter,
+                color: 'from-blue-500 to-indigo-600',
+                title: 'GST Billing Software',
+                description: 'Easy-to-use billing software with GST invoicing, inventory management, sales reports, thermal printer and barcode support — customized for your shop or business.',
+              },
+              {
+                icon: FiLayers,
+                color: 'from-purple-500 to-pink-600',
+                title: 'Management Systems',
+                description: 'Complete digital systems for schools, classes, hotels and institutions — fee collection, attendance, bookings, notifications and admin dashboards.',
+              },
+            ].map((service, index) => (
+              <motion.div
+                key={service.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="card group"
+              >
+                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${service.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                  <service.icon className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-lg font-display font-semibold text-dark-900 mb-2">{service.title}</h3>
+                <p className="text-dark-500 text-sm">{service.description}</p>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-100"
+          >
+            <div className="flex flex-col lg:flex-row lg:items-center gap-6">
+              <div className="flex-1">
+                <h3 className="text-lg sm:text-xl font-display font-semibold text-dark-900 mb-3">Who We Serve</h3>
+                <div className="flex flex-wrap gap-2">
+                  {['Banks & Finance', 'Shops & Retail', 'Schools', 'Coaching Classes', 'Hotels', 'Malls', 'Restaurants', 'And More'].map((type) => (
+                    <span
+                      key={type}
+                      className="inline-flex items-center px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-full text-dark-600 text-xs sm:text-sm font-medium"
+                    >
+                      <FiCheck className="w-3.5 h-3.5 text-emerald-500 mr-1.5" />
+                      {type}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <Link
+                to="/business-enquiry"
+                className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-emerald-500/30 hover:-translate-y-0.5 transition-all duration-300 whitespace-nowrap"
+              >
+                Get a Free Consultation <FiArrowRight className="ml-2 w-4 h-4" />
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Teaching Methodology */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -236,11 +325,16 @@ const About = () => {
               Start Your Journey Today
             </h2>
             <p className="text-xl text-blue-100 mb-8">
-              Join 500+ students who have transformed their careers with TechMitra
+              Be among our first students — or let us build the digital solution your business needs
             </p>
-            <Link to="/enrollment" className="inline-flex items-center px-8 py-4 bg-white text-primary-700 font-bold text-lg rounded-2xl hover:shadow-2xl hover:shadow-black/20 hover:-translate-y-1 transition-all duration-300">
-              Enroll Now <FiArrowRight className="ml-2 w-5 h-5" />
-            </Link>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+              <Link to="/enrollment" className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 bg-white text-primary-700 font-bold text-lg rounded-2xl hover:shadow-2xl hover:shadow-black/20 hover:-translate-y-1 transition-all duration-300">
+                Enroll Now <FiArrowRight className="ml-2 w-5 h-5" />
+              </Link>
+              <Link to="/business-enquiry" className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 border-2 border-white/40 text-white font-bold text-lg rounded-2xl hover:bg-white/10 hover:border-white/60 hover:-translate-y-1 transition-all duration-300">
+                <FiBriefcase className="mr-2 w-5 h-5" /> Business Enquiry
+              </Link>
+            </div>
           </motion.div>
         </div>
       </section>

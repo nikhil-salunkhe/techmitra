@@ -5,9 +5,82 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
-import { FiArrowRight, FiCheck, FiStar, FiPlay, FiCode, FiServer, FiSmartphone, FiCloud, FiBook, FiUsers, FiAward, FiTrendingUp, FiClock, FiCpu } from 'react-icons/fi';
+import { FiArrowRight, FiCheck, FiStar, FiPlay, FiCode, FiServer, FiSmartphone, FiCloud, FiBook, FiUsers, FiAward, FiTrendingUp, FiClock, FiCpu, FiBriefcase } from 'react-icons/fi';
 import { FaReact, FaJava, FaPython, FaNodeJs, FaGithub, FaRobot } from 'react-icons/fa';
-import { whyTechMitra, techPrograms, projectLifecycle, studentJourney, featuredProjects, faqData } from '../data/navigation';
+import { whyTechMitra, techPrograms, projectLifecycle, studentJourney, featuredProjects, faqData, businessServices, businessStats } from '../data/navigation';
+import { Link as RouterLink } from 'react-router-dom';
+import businessFlyer from '../assets/images/image.png';
+
+
+// ==================== BUSINESS SERVICES SECTION ====================
+const BusinessServicesSection = () => (
+  <section className="section-padding bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="text-center mb-10 sm:mb-14 px-4" data-aos="fade-up">
+        <div className="inline-flex items-center px-4 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs font-bold rounded-full mb-4">
+          💼 NEW - FOR BUSINESSES
+        </div>
+        <h2 className="section-title">Digital Solutions for Your Business</h2>
+        <p className="section-subtitle mx-auto">
+          We now build websites, GST billing software and management systems for shops, schools,
+          classes, hotels, banks, malls and every growing business.
+        </p>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10 sm:mb-12">
+        {businessStats.map((stat, index) => (
+          <motion.div
+            key={stat.label}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: index * 0.08 }}
+            className="bg-white rounded-xl p-4 text-center shadow-md border border-emerald-100"
+          >
+            <p className="text-2xl sm:text-3xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600">{stat.value}</p>
+            <p className="text-dark-500 text-[10px] sm:text-xs mt-1">{stat.label}</p>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Service Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+        {businessServices.map((service, index) => (
+          <motion.div
+            key={service.id}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: index * 0.1 }}
+            className="bg-white rounded-2xl p-5 sm:p-6 shadow-lg shadow-emerald-100/60 border border-emerald-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-base sm:text-lg font-display font-bold text-dark-900">{service.title}</h3>
+              <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full whitespace-nowrap">{service.startingPrice}</span>
+            </div>
+            <p className="text-dark-500 text-xs sm:text-sm leading-relaxed mb-4 flex-1">{service.description}</p>
+            <RouterLink
+              to="/business-enquiry"
+              className="inline-flex items-center justify-center px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs sm:text-sm font-semibold rounded-xl hover:shadow-lg hover:shadow-emerald-500/30 hover:-translate-y-0.5 transition-all duration-300"
+            >
+              Get Free Quote <FiArrowRight className="ml-1.5 w-3.5 h-3.5" />
+            </RouterLink>
+          </motion.div>
+        ))}
+      </div>
+
+      <div className="text-center mt-8" data-aos="fade-up">
+        <RouterLink
+          to="/services"
+          className="inline-flex items-center px-6 sm:px-8 py-3 bg-dark-900 text-white font-semibold text-sm sm:text-base rounded-2xl hover:bg-dark-800 hover:-translate-y-0.5 transition-all duration-300"
+        >
+          View All Business Services <FiArrowRight className="ml-2 w-4 h-4" />
+        </RouterLink>
+      </div>
+    </div>
+  </section>
+);
 
 // Section Wrapper
 const Section = ({ children, className = '', id = '' }) => (
@@ -31,7 +104,10 @@ const Home = () => {
       {/* 1. Hero Section */}
       <HeroSection />
 
-      {/* 2. Why TechMitra */}
+      {/* 2. Business Services (NEW) */}
+      <BusinessServicesSection />
+
+      {/* 3. Why TechMitra */}
       <Section className="bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeader
@@ -138,7 +214,7 @@ const Home = () => {
                   </span>
                   <span className="flex items-center">
                     <FiUsers className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 text-primary-500" />
-                    {program.enrolled}
+                    {program.enrolled} Seats
                   </span>
                 </div>
 
@@ -351,6 +427,46 @@ const Home = () => {
 };
 
 // ==================== HERO SECTION ====================
+// ==================== BUSINESS FLYER POSTER (hero right side) ====================
+const BusinessHeroBanner = () => (
+  <motion.div
+    initial={{ opacity: 0, y: 30 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.8 }}
+    className="relative"
+  >
+    {/* Glow accents */}
+    <div className="absolute -top-8 -right-8 w-44 h-44 sm:w-56 sm:h-56 bg-accent-500/25 rounded-full blur-3xl pointer-events-none" />
+    <div className="absolute -bottom-10 -left-8 w-40 h-40 bg-blue-500/25 rounded-full blur-3xl pointer-events-none" />
+
+    {/* Floating flyer frame — sized to sit parallel with the plan banners */}
+    <motion.div
+      animate={{ y: [0, -8, 0] }}
+      transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+      className="relative bg-dark-800/70 backdrop-blur-sm p-2 sm:p-2.5 rounded-[1.75rem] border border-white/15 shadow-2xl max-w-[340px] sm:max-w-[440px] lg:max-w-[500px] mx-auto"
+    >
+      <div className="rounded-[1.25rem] overflow-hidden flex justify-center bg-dark-800/40">
+        <img
+          src={businessFlyer}
+          alt="TechMitra - Empower Your Business with Modern Websites & Apps that Deliver Results"
+          className="block w-full h-auto max-h-[340px] sm:max-h-[450px] lg:max-h-[550px] object-cover object-top"
+          loading="eager"
+        />
+      </div>
+    </motion.div>
+
+    {/* CTA */}
+    <div className="mt-3 sm:mt-4 flex justify-center">
+      <Link
+        to="/business-enquiry"
+        className="inline-flex items-center justify-center px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold text-sm rounded-xl hover:shadow-lg hover:shadow-emerald-500/30 hover:-translate-y-0.5 transition-all duration-300"
+      >
+        Get a Free Consultation <FiArrowRight className="ml-1.5 w-3.5 h-3.5" />
+      </Link>
+    </div>
+  </motion.div>
+);
+
 const HeroSection = () => {
   return (
     <section className="relative min-h-[90vh] sm:min-h-screen flex items-center overflow-hidden">
@@ -368,7 +484,7 @@ const HeroSection = () => {
       }} />
 
       <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-32 pb-16 sm:pb-20">
-        <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-10 lg:items-start">
           {/* Left Content */}
           <div data-aos="fade-right" className="text-center sm:text-left">
             <motion.div
@@ -430,8 +546,32 @@ const HeroSection = () => {
                     </div>
                   </div>
                 </motion.div>
+
+                {/* Business Services Banner */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.5 }}
+                  className="bg-gradient-to-r from-emerald-500/20 via-teal-500/20 to-cyan-500/20 backdrop-blur-sm border border-emerald-400/30 rounded-lg sm:rounded-2xl p-2.5 sm:p-4"
+                >
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-start sm:items-center">
+                      <FiBriefcase className="w-4 h-4 sm:w-6 sm:h-6 text-emerald-300 mr-2 sm:mr-3 flex-shrink-0 mt-0.5 sm:mt-0" />
+                      <div className="text-left">
+                        <p className="text-white font-display font-bold text-xs sm:text-base leading-tight sm:leading-normal">💼 FOR BUSINESSES – Websites & GST Billing Software</p>
+                        <p className="text-emerald-200 text-[10px] sm:text-sm mt-0.5 sm:mt-1">Websites, Billing Software & Management Systems for Shops, Schools, Classes, Hotels, Banks & Malls | Free Consultation</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between pl-6 sm:pl-9">
+                      <span className="text-white font-display font-bold text-base sm:text-xl">Custom Quote</span>
+                      <Link to="/business-enquiry" className="px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold text-xs sm:text-sm rounded-lg hover:shadow-lg hover:shadow-emerald-500/30 transition-all whitespace-nowrap">
+                        GET FREE QUOTE
+                      </Link>
+                    </div>
+                  </div>
+                </motion.div>
               </div>
-              
+
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-display font-bold text-white leading-tight mb-4 sm:mb-6">
                 Become Industry Ready with{' '}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-accent-300">
@@ -440,8 +580,8 @@ const HeroSection = () => {
               </h1>
               
               <p className="text-base sm:text-lg md:text-xl text-blue-200/80 mb-6 sm:mb-8 max-w-xl mx-auto sm:mx-0">
-                Build your Final Year Project from Idea to Deployment with Expert Mentors. 
-                Learn the complete software development lifecycle.
+                Build your Final Year Project from Idea to Deployment with Expert Mentors.
+                We also build websites, apps & billing software for businesses.
               </p>
 
               <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 mb-8 sm:mb-12 max-w-md sm:max-w-none mx-auto sm:mx-0">
@@ -453,83 +593,56 @@ const HeroSection = () => {
                   Explore Programs
                 </Link>
               </div>
+
+              {/* Business Service Highlights */}
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                {[
+                  { icon: FiBriefcase, label: 'Business Websites', path: '/services' },
+                  { icon: FiServer, label: 'GST Billing Software', path: '/services' },
+                  { icon: FiCloud, label: 'Management Systems', path: '/services' },
+                ].map((chip) => (
+                  <Link
+                    key={chip.label}
+                    to={chip.path}
+                    className="inline-flex items-center px-3 py-1.5 bg-white/10 backdrop-blur-sm border border-emerald-400/30 rounded-full text-emerald-200 hover:text-white hover:bg-emerald-500/20 text-[10px] sm:text-xs font-medium transition-all duration-300"
+                  >
+                    <chip.icon className="w-3 h-3 mr-1.5" />
+                    {chip.label}
+                  </Link>
+                ))}
+              </div>
             </motion.div>
           </div>
 
           {/* Right Illustration */}
-          <div className="hidden lg:block" data-aos="fade-left">
-            <div className="relative">
-              {/* Main Code Window */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.3 }}
-                className="bg-dark-800/80 backdrop-blur-sm border border-white/10 rounded-2xl p-4 sm:p-6 shadow-2xl"
-              >
-                <div className="flex items-center space-x-2 mb-3 sm:mb-4">
-                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500" />
-                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500" />
-                  <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500" />
-                  <span className="ml-2 sm:ml-3 text-dark-400 text-xs sm:text-sm">project-dashboard</span>
-                </div>
-                <div className="space-y-1.5 sm:space-y-2 font-mono text-xs sm:text-sm">
-                  <div className="flex">
-                    <span className="text-dark-500 w-4 sm:w-6">1</span>
-                    <span className="text-blue-400">import</span>
-                    <span className="text-white ml-1 sm:ml-2">{'{ App }'}</span>
-                    <span className="text-purple-400 ml-1 sm:ml-2">from</span>
-                    <span className="text-green-400 ml-1 sm:ml-2">'./App'</span>
-                  </div>
-                  <div className="flex">
-                    <span className="text-dark-500 w-4 sm:w-6">2</span>
-                    <span className="text-blue-400">const</span>
-                    <span className="text-yellow-400 ml-1 sm:ml-2">project</span>
-                    <span className="text-white ml-1 sm:ml-2">=</span>
-                    <span className="text-purple-400 ml-1 sm:ml-2">new</span>
-                    <span className="text-blue-400 ml-1 sm:ml-2">Project</span>
-                    <span className="text-white">()</span>
-                  </div>
-                  <div className="flex">
-                    <span className="text-dark-500 w-4 sm:w-6">3</span>
-                    <span className="text-yellow-400">project.</span>
-                    <span className="text-blue-400">build</span>
-                    <span className="text-white">()</span>
-                  </div>
-                  <div className="flex">
-                    <span className="text-dark-500 w-4 sm:w-6">4</span>
-                    <span className="text-dark-400">// Deploying...</span>
-                  </div>
-                  <div className="flex">
-                    <span className="text-dark-500 w-4 sm:w-6">5</span>
-                    <span className="text-green-400">✓</span>
-                    <span className="text-green-300 ml-1 sm:ml-2">Deployment successful!</span>
-                  </div>
-                </div>
-              </motion.div>
+          <div className="flex justify-center lg:justify-start" data-aos="fade-left">
+            <div className="relative w-fit mx-auto">
+              {/* Business Services Promo Banner */}
+              <BusinessHeroBanner />
 
               {/* Floating Cards */}
               <motion.div
                 animate={{ y: [0, -15, 0] }}
                 transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                className="absolute -top-6 sm:-top-8 -right-6 sm:-right-8 w-14 h-14 sm:w-20 sm:h-20 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl"
+                className="absolute -top-4 sm:-top-5 -left-4 sm:-left-6 z-10 w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl"
               >
-                <FaReact className="w-7 h-7 sm:w-10 sm:h-10 text-white" />
+                <FaReact className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
               </motion.div>
 
               <motion.div
                 animate={{ y: [0, -20, 0] }}
                 transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
-                className="absolute -bottom-3 sm:-bottom-4 -left-6 sm:-left-8 w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-accent-500 to-accent-700 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl"
+                className="absolute bottom-24 sm:bottom-28 -left-5 sm:-left-8 z-10 w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-accent-500 to-accent-700 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl"
               >
-                <FaGithub className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+                <FaGithub className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
               </motion.div>
 
               <motion.div
                 animate={{ y: [0, -12, 0] }}
                 transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-                className="absolute top-1/2 -right-8 sm:-right-12 w-10 h-10 sm:w-14 sm:h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl"
+                className="absolute -bottom-3 sm:-bottom-4 -right-5 sm:-right-7 z-10 w-11 h-11 sm:w-14 sm:h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-xl"
               >
-                <FiCloud className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
+                <FiCloud className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </motion.div>
             </div>
           </div>

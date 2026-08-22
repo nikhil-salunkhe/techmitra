@@ -6,8 +6,20 @@ import { FaRobot } from 'react-icons/fa';
 // Training Q&A knowledge base
 const trainingQA = {
   'hello': { answer: 'Hello! 👋 Welcome to TechMitra Training Support. How can I help you today? You can ask me about our training programs, fees, duration, technologies, projects, or enrollment process.', suggestions: ['What programs do you offer?', 'What is the fee?', 'How to enroll?'] },
-  'hi': { answer: 'Hi there! 👋 Welcome to TechMitra. I\'m here to answer all your questions about our training programs. We have 5 different programs including AI, MERN, Java, Python, and React Native. What would you like to know?', suggestions: ['Tell me about programs', 'What is the fee?', 'How to enroll?'] },
-  
+  'hi': { answer: 'Hi there! 👋 Welcome to TechMitra. I\'m here to answer all your questions about our training programs. We have 5 different programs including AI, MERN, Java, Python, and React Native. What would you like to know?', suggestions: ['Tell me about programs', 'What is the fee?', 'How to enroll?', 'Services for my business'] },
+
+  // Business Services Information
+  'business': { answer: '💼 TechMitra now serves BUSINESSES too! We build:\n\n🌐 Business Websites\n🧾 GST Billing Software\n📊 Management Systems\n\nWe serve banks, shops, schools, classes, hotels, malls and all types of businesses.\n\n👉 Visit our Services page or fill the Business Enquiry form - our expert will call you within 24 hours with a FREE consultation and custom quote!', suggestions: ['Website cost for shop?', 'Billing software details', 'Fill enquiry form'] },
+  'website cost': { answer: '🌐 Business Website Packages:\n\n✅ Basic Website\n• Mobile-friendly design\n• Contact & enquiry forms\n• WhatsApp button + Google Maps\n• SEO-friendly structure\n\n✅ Advanced Website\n• Booking systems, admin panels\n• Payment integration\n• Photo galleries\n\nAll websites include 1 month FREE support! Pricing is customized per project - fill our Business Enquiry form for a free exact quotation.', suggestions: ['Delivery time?', 'See examples', 'Fill enquiry form'] },
+  'billing': { answer: '🧾 Billing Software Details:\n\n• GST Invoice Generation\n• Inventory / Stock Management\n• Customer Records & History\n• Daily / Monthly Sales Reports\n• Thermal Printer Support\n• Barcode Scanning Support\n• Multi-user Access & Data Backup\n\nPerfect for shops, hotels, restaurants and classes. One-time payment - own it forever! Fill the enquiry form for a free custom quote.', suggestions: ['Delivery time?', 'Is training provided?', 'Fill enquiry form'] },
+  'delivery time': { answer: '⏱️ Our Delivery Timelines:\n\n🌐 Simple Business Website: 7-14 days\n🧾 Billing Software: 2-3 weeks\n📊 Management Systems: 3-6 weeks\n\nWe deliver fast without compromising quality. Need it urgently? Mention it in your enquiry form and we will prioritize!', suggestions: ['Fill enquiry form', 'Pricing details', 'WhatsApp us'] },
+  'training provided': { answer: '🎓 YES! We provide FREE training when we deliver your website or software:\n\n• Complete walkthrough of all features\n• Training in Marathi, Hindi or English\n• Staff training included\n• Written user guides\n• 1 month free support after delivery\n\nYour team will be comfortable using everything before we leave!', suggestions: ['Fill enquiry form', 'Maintenance charges?', 'WhatsApp us'] },
+  'maintenance': { answer: '🔧 Maintenance & Support:\n\n✅ First 1 month: FREE support included\n\nAfter that (optional annual plans):\n• Updates & security patches\n• Regular data backups\n• Priority support on WhatsApp/Call\n\nNo forced subscriptions - pay only if you want ongoing support. One-time projects remain yours forever!', suggestions: ['Fill enquiry form', 'Pricing details', 'WhatsApp us'] },
+  'fill enquiry form': { answer: '📝 Filling our Business Enquiry form takes less than 2 minutes!\n\nJust click the "For Business" button in the top menu or visit the Services page and tap "Get Free Consultation".\n\nYou tell us:\n• Your business name & type\n• What service you need (Website / Billing / Both)\n• Your budget range (optional)\n\nOur expert calls you within 24 hours with a FREE consultation! 📞', suggestions: ['Services for my business', 'Pricing details', 'WhatsApp us'] },
+  'whatsapp': { answer: '💬 Chat with us on WhatsApp for instant replies!\n\n📱 +91 97641 49564\n\nTap here to start: wa.me/919764149564\n\nWe usually reply within a few hours during business hours (Mon-Sat, 9 AM - 8 PM). You can also fill the Business Enquiry form for a callback within 24 hours.', suggestions: ['Fill enquiry form', 'Services for my business'] },
+  'see examples': { answer: '🏢 Solutions we build for businesses:\n\n🛒 Shops & Retail - GST billing software with inventory\n🏫 Coaching Classes - Website + fee management system\n🏨 Hotels - Booking website with photo gallery\n🎓 Schools - Complete school management system\n🏦 Banks & Finance - Customer portals & dashboards\n\nThese are examples of what we deliver! Fill the Business Enquiry form, tell us what YOUR business needs, and we will show you a free demo plan!', suggestions: ['Fill enquiry form', 'Website cost for shop?', 'Billing software details'] },
+  'pricing details': { answer: '💰 Free Consultation - No Hidden Charges:\n\n🌐 Business Website\n🧾 GST Billing Software\n📊 Management Systems\n\n✅ One-time payment - own it forever\n✅ Free consultation & custom quotation\n✅ 1 month free support + free staff training\n\nEvery project is quoted based on your exact requirements - fill the enquiry form and get your free quote within 24 hours!', suggestions: ['Fill enquiry form', 'Delivery time?', 'Maintenance'] },
+
   // Program Information
   'program': { answer: '🎯 We offer 5 comprehensive training programs:\n\n1️⃣ AI Through Development (1 Month - ₹1,499)\n   Learn AI-powered development with GitHub Copilot, Cline AI, and VS Code\n\n2️⃣ MERN Web Development (2 Months - ₹3,999)\n   Build full-stack web apps with MongoDB, Express, React, Node.js\n\n3️⃣ Java Application Development (2 Months - ₹3,999)\n   Enterprise-grade Java apps with Spring Boot, MySQL, JDBC\n\n4️⃣ Python Application Development (2 Months - ₹3,999)\n   Python backend development with Django/Flask, MySQL, APIs\n\n5️⃣ React Native Mobile Apps (2 Months - ₹3,999)\n   Cross-platform mobile app development for Android\n\nAll programs include live sessions, project development, and certificate!', suggestions: ['Which is best for beginners?', 'Tell me about MERN', 'Tell me about AI program'] },
   
@@ -91,13 +103,13 @@ const trainingQA = {
   
   'who': { answer: '👥 Who Should Join TechMitra:\n\n✅ Final year students (project help)\n✅ Students wanting practical skills\n✅ Career changers\n✅ Freshers seeking jobs\n✅ Anyone interested in tech\n\n🎓 All skill levels welcome:\n• Beginners (we start from basics)\n• Intermediate (enhance your skills)\n• Advanced (master new technologies)\n\n💪 No experience? No problem! We\'ll teach you everything.', suggestions: ['Which program?', 'Fee', 'How to enroll?'] },
   
-  'why': { answer: '⭐ Why Choose TechMitra:\n\n🎯 Practical Learning:\n• Build real projects, not just theory\n• Hands-on coding experience\n• Industry-standard tools\n\n👨‍🏫 Expert Mentors:\n• 1-on-1 guidance\n• Code reviews\n• Career counseling\n\n💼 Career Focused:\n• Placement preparation\n• Resume & LinkedIn review\n• Interview prep\n\n🏆 Proven Results:\n• 500+ students trained\n• 200+ MERN, 180+ Python, 150+ Java\n• 50+ AI program students\n\n💰 Affordable:\n• Quality education at low cost\n• One-time payment\n• No hidden charges', suggestions: ['Fee', 'Programs', 'Enroll now'] },
+  'why': { answer: '⭐ Why Choose TechMitra:\n\n🎯 Practical Learning:\n• Build real projects, not just theory\n• Hands-on coding experience\n• Industry-standard tools\n\n👨‍🏫 Expert Mentors:\n• 1-on-1 guidance\n• Code reviews\n• Career counseling\n\n💼 Career Focused:\n• Placement preparation\n• Resume & LinkedIn review\n• Interview prep\n\n🚀 Fresh Startup Advantage:\n• Launched Jan 2026 - modern 2026-ready curriculum\n• Small batches = extra personal attention\n• Early-bird launch pricing - lowest you will find\n\n💰 Affordable:\n• Quality education at low cost\n• One-time payment\n• No hidden charges', suggestions: ['Fee', 'Programs', 'Enroll now'] },
 };
 
 // Default response
 const defaultResponse = {
-  answer: 'I\'m not sure I understand. 🤔 Try asking me about:\n\n• 🎯 Training programs (AI, MERN, Java, Python, React Native)\n• 💰 Fees (₹1,499 to ₹3,999)\n• 📅 Duration (1-2 months)\n• 💻 Technologies & skills\n• 📝 Enrollment process\n• 🎓 Certificate & placement\n• 👨‍🏫 1-on-1 mentorship\n• 🛠️ Projects you\'ll build\n• 🕐 Batch timings\n• 📞 Contact information',
-  suggestions: ['What programs do you offer?', 'What is the fee?', 'How to enroll?', 'Tell me about MERN', 'Contact support'],
+  answer: 'I\'m not sure I understand. 🤔 Try asking me about:\n\n• 🎯 Training programs (AI, MERN, Java, Python, React Native)\n• 💰 Course fees (₹1,499 to ₹3,999)\n• 💼 Business services (Websites & Billing Software)\n• 📝 Enrollment / Enquiry process\n• 🎓 Certificate & placement\n• 👨‍🏫 1-on-1 mentorship\n• 🕐 Batch timings\n• 📞 Contact information',
+  suggestions: ['What programs do you offer?', 'What is the fee?', 'How to enroll?', 'Services for my business', 'Contact support'],
 };
 
 function findBestMatch(message) {
@@ -172,6 +184,11 @@ function findBestMatch(message) {
     return trainingQA['who'];
   }
   
+  // Business services queries
+  if (msg.includes('shop') || msg.includes('hotel') || msg.includes('school') || msg.includes('mall') || msg.includes('bank') || msg.includes('gst') || msg.includes('invoice') || msg.includes('my business') || msg.includes('enquiry form')) {
+    return trainingQA['business'];
+  }
+
   // Program-specific queries
   if (msg.includes('ai') && (msg.includes('program') || msg.includes('course') || msg.includes('training'))) {
     return trainingQA['ai program'];
